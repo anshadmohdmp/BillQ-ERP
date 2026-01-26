@@ -12,7 +12,7 @@ const Credits = () => {
 
     const fetchCredits = async () => {
         try {
-            const response = await axios.get("http://localhost:3002/credits");
+            const response = await axios.get("https://billq-erp.onrender.com/credits");
             setCredits(response.data);
         } catch (error) {
             console.error("Error fetching Credits:", error);
@@ -31,7 +31,7 @@ const Credits = () => {
 
         try {
             await axios.put(
-                `http://localhost:3002/invoices/${invoiceId}/paymentMethod`,
+                `https://billq-erp.onrender.com/invoices/${invoiceId}/paymentMethod`,
                 { paymentMethod: selectedMethod }
             );
 

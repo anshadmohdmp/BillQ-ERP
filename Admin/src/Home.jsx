@@ -12,7 +12,7 @@ const Home = () => {
   // Fetch invoices
   useEffect(() => {
     axios
-      .get("http://localhost:3002/invoices")
+      .get("https://billq-erp.onrender.com/invoices")
       .then((res) => setInvoices(res.data))
       .catch((err) => console.error(err));
   }, []);

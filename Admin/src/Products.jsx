@@ -19,7 +19,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:3002/products");
+      const response = await axios.get("https://billq-erp.onrender.com/products");
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -45,7 +45,7 @@ const Products = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3002/products/${selectedProductId}`);
+      await axios.delete(`https://billq-erp.onrender.com/products/${selectedProductId}`);
       setProducts(Products.filter((p) => p._id !== selectedProductId));
       setShowDeleteConfirm(false);
     } catch (error) {

@@ -19,7 +19,7 @@ const Suppliers = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await axios.get("http://localhost:3002/suppliers");
+      const response = await axios.get("https://billq-erp.onrender.com/suppliers");
       setSuppliers(response.data);
     } catch (error) {
       console.error("Error fetching Suppliers:", error);
@@ -43,7 +43,7 @@ const Suppliers = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3002/suppliers/${selectedSupplierId}`);
+      await axios.delete(`https://billq-erp.onrender.com/suppliers/${selectedSupplierId}`);
       setSuppliers(Suppliers.filter((s) => s._id !== selectedSupplierId));
       setShowDeleteConfirm(false);
     } catch (error) {

@@ -11,7 +11,7 @@ const Stocks = () => {
   const fetchStocks = async () => {
     try {
       // Fetch all Stocks from Stocks collection
-      const response = await axios.get("http://localhost:3002/stocks");
+      const response = await axios.get("https://billq-erp.onrender.com/stocks");
       setStocks(response.data);
     } catch (error) {
       console.error("Error fetching Stocks:", error);

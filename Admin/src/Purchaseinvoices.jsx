@@ -12,7 +12,7 @@ const Purchaseinvoices = () => {
 
 
   useEffect(() => {
-    axios.get("http://localhost:3002/purchaseinvoices")
+    axios.get("https://billq-erp.onrender.com/purchaseinvoices")
       .then((response) => {
         setInvoices(response.data);
       })

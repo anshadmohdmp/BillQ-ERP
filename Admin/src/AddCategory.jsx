@@ -26,7 +26,7 @@ const AddCategory = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:3002/categories");
+      const response = await axios.get("https://billq-erp.onrender.com/categories");
       setFetchedCategoryName(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -44,7 +44,7 @@ const AddCategory = () => {
     setError("");
 
     try {
-      await axios.post("http://localhost:3002/createcategory", { CategoryName });
+      await axios.post("https://billq-erp.onrender.com/createcategory", { CategoryName });
       setShowAddModal(true);
       setCategoryName("");
       fetchCategories();
@@ -61,7 +61,7 @@ const AddCategory = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3002/categories/${deleteId}`);
+      await axios.delete(`https://billq-erp.onrender.com/categories/${deleteId}`);
       setShowDeleteConfirm(false);
       setShowDeleteSuccess(true);
       fetchCategories();

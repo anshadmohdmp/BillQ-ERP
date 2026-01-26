@@ -33,13 +33,13 @@
 
     // Fetch Stocks
     useEffect(() => {
-      axios.get("http://localhost:3002/stocks")
+      axios.get("https://billq-erp.onrender.com/stocks")
         .then(res => setStocks(res.data))
         .catch(err => console.error(err));
     }, []);
 
     useEffect(() => {
-      axios.get("http://localhost:3002/Customers")
+      axios.get("https://billq-erp.onrender.com/Customers")
         .then(res => setFetchedCustomers(res.data))
         .catch(err => console.error(err));
     }, [])
@@ -298,7 +298,7 @@
       };
 
       try {
-        await axios.post("http://localhost:3002/createinvoice", billData);
+        await axios.post("https://billq-erp.onrender.com/createinvoice", billData);
         setShowModal(false);      
         setShowSuccessModal(true);
 

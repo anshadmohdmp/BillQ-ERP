@@ -23,7 +23,7 @@ const AddSuppliers = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:3002/createsupplier", {
+      const response = await axios.post("https://billq-erp.onrender.com/createsupplier", {
         SupplierName,
         ContactPerson,
         ContactNumber,

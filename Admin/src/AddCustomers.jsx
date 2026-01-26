@@ -23,7 +23,7 @@ const AddCustomers = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:3002/Customers", {
+      const response = await axios.post("https://billq-erp.onrender.com/Customers", {
         CustomerName,
         CustomerAddress,
         CustomerNumber,

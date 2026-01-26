@@ -14,7 +14,7 @@ const Invoices = () => {
 
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get("http://localhost:3002/invoices");
+      const response = await axios.get("https://billq-erp.onrender.com/invoices");
       setInvoices(response.data);
     } catch (error) {
       console.error("Error fetching invoices:", error);
@@ -32,7 +32,7 @@ const Invoices = () => {
   const handlePrint = async () => {
     setShowPrintConfirm(false);
     try {
-      const response = await axios.get(`http://localhost:3002/invoices/${selectedInvoiceId}`);
+      const response = await axios.get(`https://billq-erp.onrender.com/invoices/${selectedInvoiceId}`);
       const billData = response.data;
 
       const Subtotal =

@@ -17,7 +17,7 @@ const Editsuppliers = () => {
   // Fetch supplier data
   useEffect(() => {
     axios
-      .get(`http://localhost:3002/suppliers/${id}`)
+      .get(`https://billq-erp.onrender.com/suppliers/${id}`)
       .then((response) => {
         const supplier = response.data;
         setSupplierName(supplier.SupplierName);
@@ -38,7 +38,7 @@ const Editsuppliers = () => {
     setError("");
 
     try {
-      await axios.put(`http://localhost:3002/suppliers/${id}`, {
+      await axios.put(`https://billq-erp.onrender.com/suppliers/${id}`, {
         SupplierName,
         ContactPerson,
         ContactNumber,

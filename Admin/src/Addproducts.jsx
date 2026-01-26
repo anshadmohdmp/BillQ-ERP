@@ -21,7 +21,7 @@ const Addproducts = () => {
   // ✅ Fetch Categories
   useEffect(() => {
     axios
-      .get("http://localhost:3002/categories")
+      .get("https://billq-erp.onrender.com/categories")
       .then((response) => setFetchedCategory(response.data))
       .catch((error) => console.error("Error fetching categories:", error));
   }, []);
@@ -29,7 +29,7 @@ const Addproducts = () => {
   // ✅ Fetch Units
   useEffect(() => {
     axios
-      .get("http://localhost:3002/units")
+      .get("https://billq-erp.onrender.com/units")
       .then((response) => setFetchedUnit(response.data))
       .catch((error) => console.error("Error fetching units:", error));
   }, []);
@@ -56,7 +56,7 @@ const Addproducts = () => {
     setError("");
 
     try {
-      await axios.post("http://localhost:3002/createproduct", {
+      await axios.post("https://billq-erp.onrender.com/createproduct", {
         Barcode,
         ProductName,
         Unit,

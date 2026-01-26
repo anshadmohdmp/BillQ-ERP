@@ -28,7 +28,7 @@ const Editstock = () => {
   // Fetch product data
   useEffect(() => {
     axios
-      .get(`http://localhost:3002/products/${id}`)
+      .get(`https://billq-erp.onrender.com/products/${id}`)
       .then((response) => {
         const data = response.data;
         setBarcode(data.Barcode);
@@ -47,9 +47,9 @@ const Editstock = () => {
 
   // Fetch categories, units, and suppliers
   useEffect(() => {
-    axios.get("http://localhost:3002/categories").then((res) => setfetchedCategory(res.data));
-    axios.get("http://localhost:3002/units").then((res) => setfetchedUnit(res.data));
-    axios.get("http://localhost:3002/suppliers").then((res) => setfetchedsuppliers(res.data));
+    axios.get("https://billq-erp.onrender.com/categories").then((res) => setfetchedCategory(res.data));
+    axios.get("https://billq-erp.onrender.com/units").then((res) => setfetchedUnit(res.data));
+    axios.get("https://billq-erp.onrender.com/suppliers").then((res) => setfetchedsuppliers(res.data));
   }, []);
 
   const SubmitData = async (e) => {
@@ -63,7 +63,7 @@ const Editstock = () => {
     setError("");
 
     try {
-      await axios.put(`http://localhost:3002/products/${id}`, {
+      await axios.put(`https://billq-erp.onrender.com/products/${id}`, {
         Barcode,
         ProductName,
         Quantity,

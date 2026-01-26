@@ -17,7 +17,7 @@ const EditCustomers = () => {
   // Fetch Customer data
   useEffect(() => {
     axios
-      .get(`http://localhost:3002/Customers/${id}`)
+      .get(`https://billq-erp.onrender.com/Customers/${id}`)
       .then((response) => {
         const Customer = response.data;
         setCustomerName(Customer.CustomerName);
@@ -38,7 +38,7 @@ const EditCustomers = () => {
     setError("");
 
     try {
-      await axios.put(`http://localhost:3002/Customers/${id}`, {
+      await axios.put(`https://billq-erp.onrender.com/Customers/${id}`, {
         CustomerName,
         CustomerAddress,
         CustomerNumber,
