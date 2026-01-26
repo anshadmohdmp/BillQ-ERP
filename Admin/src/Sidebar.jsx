@@ -243,8 +243,17 @@ const Sidebar = () => {
           <Nav className="flex-column">
             <Nav.Link onClick={() => navigate("/home")}>Home</Nav.Link>
             <Nav.Link onClick={() => navigate("/addproducts")}>Add Products</Nav.Link>
+            <Nav.Link onClick={() => navigate("/Products")}>Products</Nav.Link>
+            <Nav.Link onClick={() => navigate("/addcategory")}>Add Category</Nav.Link>
+            <Nav.Link onClick={() => navigate("/suppliers")}>Suppliers</Nav.Link>
+            <Nav.Link onClick={() => navigate("/Customers")}>Customers</Nav.Link>
             <Nav.Link onClick={() => navigate("/stocks")}>Stocks</Nav.Link>
-            <Nav.Link onClick={() => navigate("/billing")}>Bill</Nav.Link>
+            <Nav.Link onClick={() => navigate("/billing")}>Sales Bill</Nav.Link>
+            <Nav.Link onClick={() => navigate("/purchasebill")}>Purchase Bill</Nav.Link>
+            <Nav.Link onClick={() => navigate("/invoices")}>Sales Invoices</Nav.Link>
+            <Nav.Link onClick={() => navigate("/credits")}>Credits</Nav.Link>
+            <Nav.Link onClick={() => navigate("/purchaseinvoices")}>Purchase Invoices</Nav.Link>
+            <Nav.Link onClick={() => navigate("/unit")}>Unit</Nav.Link>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
