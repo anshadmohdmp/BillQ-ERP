@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
 import { MdPrint } from "react-icons/md";
+import "./Css/Purchaseinvoices.css";
 
 const Purchaseinvoices = () => {
   const [Invoices, setInvoices] = useState([]);
@@ -25,7 +26,7 @@ const Purchaseinvoices = () => {
 
 
   return (
-    <div style={{ marginLeft: "250px", minHeight: "100vh", backgroundColor: "#3e3e3e", padding: "20px", marginTop: "-160px" }}>
+    <div className="purchaseinvoices">
     
 
       <Card style={{ width: "100%", maxWidth: "calc(100% - 40px)", background: "#2a2a2a", borderRadius: "20px", padding: "20px", boxShadow: "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)", color: "#fff", overflow: "hidden" }}>

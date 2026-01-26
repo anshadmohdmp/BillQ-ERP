@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
-import "../src/Css/Suppliers.css";
+import "../src/Css/Customers.css";
 
 const Customers = () => {
   const [Customers, setCustomers] = useState([]);
@@ -54,13 +54,7 @@ const Customers = () => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        padding: "20px",
-        marginTop: "-160px",
-      }}
+      className="customers"
     >
       {/* Edit Confirmation Modal */}
       <Modal
@@ -215,7 +209,7 @@ const Customers = () => {
           </Button>
         </div>
 
-        <div style={{ overflowX: "auto" }}>
+        <div  style={{ overflowX: "auto" }}>
           <Table
             striped
             bordered

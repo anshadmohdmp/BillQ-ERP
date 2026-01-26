@@ -4,6 +4,7 @@ import axios from "axios";
 import { MdDeleteOutline } from "react-icons/md";
 import Select from "react-select";
 import { v4 as uuidv4 } from 'uuid';
+import "./Css/Purchasebilling.css";
 
 const PurchaseBill = () => {
   const [SupplierName, setSupplierName] = useState("");
@@ -310,16 +311,7 @@ useEffect(() => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        marginTop: "-160px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        display: "flex",
-        justifyContent: "center",
-        padding: "60px 0",
-        overflowY: "auto",
-      }}
+      className="billing"
     >
       <Card
         style={{
@@ -373,8 +365,8 @@ useEffect(() => {
           </div>
 
           {/* Product Table */}
-          <div>
-            <Table striped bordered hover variant="dark" style={{ backgroundColor: "#3a3a3a", borderRadius: "25px" }}>
+          <div className="product-table-wrapper">
+            <Table striped bordered hover variant="dark" className="product-table">
               <thead>
                 <tr>
                   <th>#</th>

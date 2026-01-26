@@ -3,6 +3,7 @@ import { Button, Form, Card, Table, Modal } from "react-bootstrap";
 import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import "../src/Css/Units.css"
 
 const Unit = () => {
   const [UnitName, setUnitName] = useState("");
@@ -86,13 +87,7 @@ const Unit = () => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        marginTop: "-160px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        padding: "20px",
-      }}
+      className="units"
     >
       {/* Add Unit Card */}
       <Card

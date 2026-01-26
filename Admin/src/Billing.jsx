@@ -3,6 +3,7 @@
   import axios from "axios";
   import { MdDeleteOutline } from "react-icons/md";
   import "./Css/AddProducts.css";
+  import "./Css/Billing.css";
   import Select from "react-select";
 
 
@@ -334,16 +335,7 @@
 
     return (
       <div
-        style={{
-          marginLeft: "250px",
-          marginTop: "-160px",
-          minHeight: "100vh",
-          backgroundColor: "#3e3e3e",
-          display: "flex",
-          justifyContent: "center",
-          padding: "60px 0",
-          overflowY: "auto",
-        }}
+        className="billing"
       >
         <Card
           style={{
@@ -433,8 +425,8 @@
 
 
             {/* Product Table */}
-            <div>
-              <Table striped bordered hover variant="dark" style={{ backgroundColor: "#3a3a3a", borderRadius: "25px" }}>
+            <div className="product-table-wrapper" >
+              <Table striped bordered hover variant="dark" className="product-table">
                 <thead>
                   <tr>
                     <th>#</th>

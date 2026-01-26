@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
 import { MdPrint } from "react-icons/md";
+import "./Css/Invoices.css";
 
 const Invoices = () => {
   const [Invoices, setInvoices] = useState([]);
@@ -137,7 +138,7 @@ const Invoices = () => {
   };
 
   return (
-    <div style={{ marginLeft: "250px", minHeight: "100vh", backgroundColor: "#3e3e3e", padding: "20px", marginTop: "-160px" }}>
+    <div className="invoices">
       {/* Print Confirmation Modal */}
       <Modal show={showPrintConfirm} onHide={() => setShowPrintConfirm(false)} centered>
         <Modal.Body

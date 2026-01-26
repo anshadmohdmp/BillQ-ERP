@@ -54,13 +54,7 @@ const Suppliers = () => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        padding: "20px",
-        marginTop: "-160px",
-      }}
+      className="suppliers"
     >
       {/* Edit Confirmation Modal */}
       <Modal

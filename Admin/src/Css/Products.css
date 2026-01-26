@@ -1,14 +1,4 @@
-.submit-botton {
-  color: white;
-  background: "linear-gradient(145deg, #3a3a3a, #1e1e1e)"
-}
-
-.submit-button:hover {
-  color: rgb(205, 162, 7);
-  transform: scale(1.1);
-}
-
-.suppliers{
+.products{
         margin-left: 250px;
         min-height: 100vh;
         background-color: #3e3e3e;
@@ -17,9 +7,10 @@
 }
 
 @media (max-width: 768px) {
-.suppliers{
+    .products {
         margin-left: 0;
         padding: 10px;
+        width: 100%;
         margin-top: 0;
     }
 }

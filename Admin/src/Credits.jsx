@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Table, Card, Button } from "react-bootstrap";
+import "./Css/Credits.css";
 
 const Credits = () => {
     const [Credits, setCredits] = useState([]);
@@ -54,13 +55,7 @@ const Credits = () => {
 
     return (
         <div
-            style={{
-                marginLeft: "250px",
-                minHeight: "100vh",
-                backgroundColor: "#3e3e3e",
-                padding: "20px",
-                marginTop: "-160px",
-            }}
+            className="credits"
         >
             <Card
                 style={{

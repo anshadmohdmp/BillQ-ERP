@@ -1,19 +1,15 @@
-
-
-.addcategory{
+.units{
         margin-left: 250px;
         margin-top: -160px;
         min-height: 100vh;
         background-color: #3e3e3e;
-        justify-content: center;
-        align-items: center;
-        padding: 60px 0;
-        overflow-y: auto;
+        padding: 20px;
 }
+
 @media (max-width: 768px) {
-.addcategory{
+.units{
         margin-left: 0;
+        padding: 10px;
         margin-top: 0;
-        padding: 20px 0;
     }
 }

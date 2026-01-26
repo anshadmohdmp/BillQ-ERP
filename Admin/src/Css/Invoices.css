@@ -1,0 +1,15 @@
+.invoices{
+    margin-left: 250px;
+    min-height: 100vh;
+    background-color: #3e3e3e;
+    padding: 20px;
+    margin-top: -160px;
+}
+
+@media (max-width: 768px) {
+.invoices{
+        margin-left: 0;
+        padding: 10px;
+        margin-top: 0;
+    }       
+}

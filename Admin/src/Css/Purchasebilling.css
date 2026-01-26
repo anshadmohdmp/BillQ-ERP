@@ -1,0 +1,40 @@
+.billing{
+    margin-left: 250px;
+    margin-top: -160px;
+    min-height: 100vh;
+    background-color: #3e3e3e;
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+    overflow-y: auto;
+}
+
+.product-table {
+    background-color: #3a3a3a;
+    border-radius: 25px;
+}
+
+/* 👉 wrapper for scroll */
+.product-table-wrapper {
+    overflow-x: auto;
+} 
+
+
+@media (max-width: 768px) {
+    .billing{
+        margin-left: 0;
+        margin-top: 0;
+        padding: 20px 0;
+    }
+
+    /* enable horizontal scroll on mobile */
+    .product-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .product-table {
+        min-width: 700px; /* adjust based on columns */
+        font-size: 14px;
+    }
+}

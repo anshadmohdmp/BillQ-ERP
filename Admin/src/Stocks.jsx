@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Table } from "react-bootstrap";
 import axios from "axios";
+import "./Css/Stocks.css";
 
 const Stocks = () => {
   const [Stocks, setStocks] = useState([]);
@@ -23,7 +24,7 @@ const Stocks = () => {
   }, []);
 
   return (
-    <div style={{ marginLeft: "250px", minHeight: "100vh", backgroundColor: "#3e3e3e", padding: "20px", marginTop: "-160px" }}>
+    <div className="stocks">
       <Card
         style={{
           width: "100%",

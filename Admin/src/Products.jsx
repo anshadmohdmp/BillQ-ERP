@@ -4,6 +4,7 @@ import { Table, Card, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import "../src/Css/Suppliers.css";
+import "./Css/Products.css";
 
 const Products = () => {
   const [Products, setProducts] = useState([]);
@@ -56,13 +57,7 @@ const Products = () => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        padding: "20px",
-        marginTop: "-160px",
-      }}
+      className="products"
     >
       {/* Edit Confirmation Modal */}
       <Modal show={showEditConfirm} onHide={() => setShowEditConfirm(false)} centered>

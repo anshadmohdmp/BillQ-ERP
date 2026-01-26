@@ -3,6 +3,8 @@ import { Button, Form, Card, Table, Modal } from "react-bootstrap";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./Css/AddCategory.css";
+
 
 const AddCategory = () => {
   const [CategoryName, setCategoryName] = useState("");
@@ -94,16 +96,7 @@ const AddCategory = () => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        marginTop: "-160px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "60px 0",
-        overflowY: "auto",
-      }}
+      className="addcategory"
     >
       {/* Add Success Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
