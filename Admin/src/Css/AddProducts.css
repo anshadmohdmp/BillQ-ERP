@@ -1,0 +1,53 @@
+/* ===== Inputs and Textareas ===== */
+.add-product-form input,
+.add-product-form textarea {
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  color: #fff; /* typed text color */
+  background: #3a3a3a;
+  box-shadow: inset 3px 3px 6px rgba(0,0,0,0.6),
+              inset -3px -3px 6px rgba(255,255,255,0.05);
+}
+
+/* Placeholder for input/textarea */
+.add-product-form input::placeholder,
+.add-product-form textarea::placeholder {
+  color: #bdbdbd; /* placeholder color */
+  opacity: 1;
+}
+
+/* ===== Selects ===== */
+.add-product-form select {
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  background-color: #3a3a3a;
+  color: #bdbdbd; /* placeholder color */
+  box-shadow: inset 3px 3px 6px rgba(0,0,0,0.6),
+              inset -3px -3px 6px rgba(255,255,255,0.05);
+  appearance: none; /* remove default arrow for consistency */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Placeholder option */
+.add-product-form select option:disabled {
+  color: #bdbdbd; /* placeholder black-ish */
+}
+
+/* Selected option text */
+.add-product-form select option:checked {
+  color: #ffffff; /* white when selected */
+}
+
+.submit-button {
+  color: white;
+  background: "linear-gradient(145deg, #3a3a3a, #1e1e1e)"
+}
+
+.submit-button:hover {
+  color: rgb(205, 162, 7);
+  transform: scale(1.1);
+}
+

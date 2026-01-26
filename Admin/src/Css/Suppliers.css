@@ -1,0 +1,9 @@
+.submit-botton {
+  color: white;
+  background: "linear-gradient(145deg, #3a3a3a, #1e1e1e)"
+}
+
+.submit-button:hover {
+  color: rgb(205, 162, 7);
+  transform: scale(1.1);
+}

@@ -1,0 +1,15 @@
+# Node modules
+node_modules/
+server/node_modules/
+admin/node_modules/
+
+# Build folder
+admin/build/
+
+# Environment files
+.env
+server/.env
+admin/.env
+
+# MacOS / system files
+.DS_Store

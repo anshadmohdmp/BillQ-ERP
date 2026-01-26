@@ -1,0 +1,44 @@
+.billq {
+  color: white;
+}
+
+.billq:hover {
+  color: rgb(0, 20, 236);
+  transform: scale(1.1);
+}
+
+.navlinks {
+  color: white;
+  font-weight: 500;
+}
+
+.navlinks:hover {
+  color: rgb(205, 162, 7);
+  border-radius: 10px;
+  transform: scale(1.1);
+}
+
+/* 🔥 Active nav link turns red */
+.active-link {
+  color: rgb(205, 162, 7) !important;
+  font-weight: 700;
+  transform: scale(1.1);
+}
+
+/* Custom Scrollbar for Sidebar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+::-webkit-scrollbar-track {
+  background: #2c2c2c;
+}
