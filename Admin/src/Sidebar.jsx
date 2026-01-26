@@ -8,6 +8,7 @@ import { TbCategory2 } from "react-icons/tb";
 import { FiFileText } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Css/Sidebar.css";
+import { color } from "framer-motion";
 
 const Sidebar = () => {
   const [show, setShow] = useState(false);
@@ -50,16 +51,20 @@ const Sidebar = () => {
     <>
       {/* Mobile toggle button */}
       <Button
-        variant="dark"
-        className="d-md-none m-2"
-        onClick={toggleSidebar}
-        style={{
-          borderRadius: "10px",
-          boxShadow: "3px 3px 6px rgba(0,0,0,0.5)",
-        }}
-      >
-        ☰ Menu
-      </Button>
+  variant="dark"
+  className="d-md-none"
+  onClick={toggleSidebar}
+  style={{
+    position: "fixed",
+    top: "10px",
+    left: "10px",
+    zIndex: 1050,
+    borderRadius: "10px",
+    boxShadow: "3px 3px 6px rgba(0,0,0,0.5)",
+  }}
+>
+  ☰ Menu
+</Button>
 
       {/* Desktop sidebar */}
       <div
@@ -235,9 +240,9 @@ const Sidebar = () => {
       </div>
 
       {/* Mobile offcanvas */}
-      <Offcanvas style={{background: "#2a2a2a"}} show={show} onHide={toggleSidebar} responsive="md">
+      <Offcanvas style={{background: "#ffffff"}} show={show} onHide={toggleSidebar} responsive="md">
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Menu</Offcanvas.Title>
+          <Offcanvas.Title style={{color:"black"}}>Menu</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Nav className="flex-column">

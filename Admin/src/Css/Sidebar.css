@@ -42,3 +42,11 @@
 ::-webkit-scrollbar-track {
   background: #2c2c2c;
 }
+
+@media (max-width: 768px) {
+
+  .navlinks1{
+    color: rgb(0, 0, 0) !important;
+  }
+
+}

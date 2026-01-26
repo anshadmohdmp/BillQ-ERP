@@ -1,32 +1,45 @@
-.home-container {
-   margin-left: 250px;
-        min-height: 100vh;
-        background-color: #3e3e3e;
-        padding: 20px;
-        margin-top: -160px;
+/* Global safety */
+* {
+  box-sizing: border-box;
 }
 
-.card{
-    background: #2a2a2a;
-              color: #fff;
-              border-radius: 15px;
-              padding: 20px;
-              box-shadow:
-                8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05);
+/* Main home wrapper */
+.home {
+  min-height: 100vh;
+  background: #3e3e3e;
+  padding: 20px;
+  padding-left: 270px; /* sidebar width */
 }
 
+/* Title */
+.home-title {
+  color: #e6e6e6;
+  margin: 0 0 20px 0;
+}
 
+/* Summary cards */
+.summary-card {
+  background: #2a2a2a;
+  color: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  height: 100%;
+  box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.7),
+    -4px -4px 10px rgba(255, 255, 255, 0.05);
+}
 
+/* Chart */
+.chart-card {
+  background: #2a2a2a;
+  color: #fff;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+/* Mobile */
 @media (max-width: 768px) {
-
-.home-container {
-        margin-left: 0;
-        padding: 10px;
-        margin-top: 0;
-    }
-
-    .card{
-        width: 95%;
-        margin-bottom: 30px;
-    }
+  .home {
+    padding-left: 15px;
+    padding-top: 60px;
+  }
 }
