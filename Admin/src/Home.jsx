@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Row, Col } from "react-bootstrap";
 import axios from "axios";
+import "./Css/Home.css";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Home = () => {
@@ -10,7 +11,7 @@ const Home = () => {
   const [totalSales, setTotalSales] = useState(0);
 
   // Fetch invoices
-  useEffect(() => {
+  useEffect(() => { 
     axios
       .get("https://billq-erp.onrender.com/invoices")
       .then((res) => setInvoices(res.data))
@@ -53,13 +54,8 @@ const Home = () => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        padding: "20px",
-        marginTop: "-160px",
-      }}
+    className="home-container"
+      
     >
       <h2
         style={{
@@ -74,14 +70,7 @@ const Home = () => {
       <Row style={{ marginTop: "80px" }} className="mb-4">
         <Col md={3}>
           <Card
-            style={{
-              background: "#2a2a2a",
-              color: "#fff",
-              borderRadius: "15px",
-              padding: "20px",
-              boxShadow:
-                "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)",
-            }}
+            className="card"
           >
             <h5>Total Invoices</h5>
             <h2>{Invoices.length}</h2>
@@ -89,14 +78,7 @@ const Home = () => {
         </Col>
         <Col md={3}>
           <Card
-            style={{
-              background: "#2a2a2a",
-              color: "#fff",
-              borderRadius: "15px",
-              padding: "20px",
-              boxShadow:
-                "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)",
-            }}
+            className="card"
           >
             <h5>Total Sales</h5>
             <h2>₹{totalSales.toFixed(2)}</h2>
@@ -104,14 +86,7 @@ const Home = () => {
         </Col>
         <Col md={3}>
           <Card
-            style={{
-              background: "#2a2a2a",
-              color: "#fff",
-              borderRadius: "15px",
-              padding: "20px",
-              boxShadow:
-                "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)",
-            }}
+            className="card"
           >
             <h5>Average Sale</h5>
             <h2>₹{Invoices.length > 0 ? (totalSales / Invoices.length).toFixed(2) : 0}</h2>
@@ -119,14 +94,7 @@ const Home = () => {
         </Col>
         <Col md={3}>
           <Card
-            style={{
-              background: "#2a2a2a",
-              color: "#fff",
-              borderRadius: "15px",
-              padding: "20px",
-              boxShadow:
-                "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)",
-            }}
+            className="card"
           >
             <h5>Total Profit</h5>
             <h2>₹{totalProfit.toFixed(2)}</h2>
@@ -135,14 +103,7 @@ const Home = () => {
       </Row>
 
       <Card
-        style={{
-          background: "#2a2a2a",
-          color: "#fff",
-          borderRadius: "15px",
-          padding: "20px",
-          boxShadow:
-            "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)",
-        }}
+        className="card"
       >
         <h5>Sales Report</h5>
         <ResponsiveContainer width="100%" height={300}>

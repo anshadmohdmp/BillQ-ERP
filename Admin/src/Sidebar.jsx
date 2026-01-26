@@ -235,7 +235,7 @@ const Sidebar = () => {
       </div>
 
       {/* Mobile offcanvas */}
-      <Offcanvas show={show} onHide={toggleSidebar} responsive="md">
+      <Offcanvas style={{background: "#2a2a2a"}} show={show} onHide={toggleSidebar} responsive="md">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Menu</Offcanvas.Title>
         </Offcanvas.Header>

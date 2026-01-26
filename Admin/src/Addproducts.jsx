@@ -85,29 +85,10 @@ const Addproducts = () => {
 
   return (
     <div
-      style={{
-        marginLeft: "250px",
-        marginTop: "-160px",
-        minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "60px 0",
-        overflowY: "auto",
-      }}
+      className="Add-products"
     >
       <Card
-        style={{
-          width: "1100px",
-          padding: "40px",
-          borderRadius: "20px",
-          background: "#2a2a2a",
-          boxShadow:
-            "8px 8px 16px rgba(0,0,0,0.7), -4px -4px 12px rgba(255,255,255,0.05)",
-          color: "#fff",
-          margin: "10px 0",
-        }}
+        className="card"
       >
         <h2
           style={{
