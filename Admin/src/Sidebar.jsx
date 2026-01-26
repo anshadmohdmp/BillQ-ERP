@@ -86,7 +86,7 @@ const Sidebar = () => {
           }}
           onClick={changepage}
         >
-          BillIQ
+          BillQ
         </h3>
 
         <h5

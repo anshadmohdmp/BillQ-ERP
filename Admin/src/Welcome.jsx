@@ -45,7 +45,7 @@ const Welcome = () => {
             transition: { repeat: Infinity, duration: 1.5 },
           }}
         >
-          BillIQ
+          BillQ
         </motion.span>
       </motion.h1>
 

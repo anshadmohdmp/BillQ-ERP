@@ -68,7 +68,7 @@ const Home = () => {
           marginBottom: "20px",
         }}
       >
-        BillIQ
+        BillQ
       </h2>
 
       <Row style={{ marginTop: "80px" }} className="mb-4">
