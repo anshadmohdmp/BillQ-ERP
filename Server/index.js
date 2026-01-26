@@ -16,7 +16,7 @@ const Credits = require("./Models/Credits");
 const app = express();
 
 app.use(cors({
-  origin: "http://bill-q-erp.vercel.app", 
+  origin: "https://bill-q-erp.vercel.app", 
     credentials: true
 }));
 app.use(express.json());
