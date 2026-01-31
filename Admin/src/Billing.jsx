@@ -210,7 +210,7 @@
             <header>
               <div>
                 <h1>Students Hub</h1>
-                <p>Opposite High School Gate,<br>Mathamangalam,Kannur,Kerala<br>Phone: +918921628952<br>Email: studentshub@gmail.com</p>
+                <p>Opposite GHSS High School Gate,<br>Mathamangalam,Kannur,Kerala<br>Phone: +918921628952<br>Email: studentshub@gmail.com</p>
               </div>
               <div>
                 <h2>INVOICE</h2>
@@ -241,7 +241,6 @@
             <section class="summary">
               <table>
                 <tr><td>Subtotal:</td><td>${billData.Subtotal.toFixed(2)}</td></tr>
-                <tr><td>Tax:</td><td>${billData.Tax.toFixed(2)}</td></tr>
                 <tr><td>Discount:</td><td>-${billData.Discount.toFixed(2)}</td></tr>
                 <tr class="total"><td>Total:</td><td>${billData.TotalAmount.toFixed(2)}</td></tr>
                 <tr><td>Payment Method:</td><td>${billData.PaymentMethod}</td></tr>
