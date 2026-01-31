@@ -54,8 +54,6 @@ const Editunit = () => {
   return (
     <div
       style={{
-        marginLeft: "250px",
-        marginTop: "-160px",
         minHeight: "100vh",
         backgroundColor: "#3e3e3e",
         padding: "20px",

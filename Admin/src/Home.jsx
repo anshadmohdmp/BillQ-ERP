@@ -59,21 +59,21 @@ const Home = () => {
 
       <Row className="g-3 mb-4">
         <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card">
+          <Card className="summary-card1">
             <h6>Total Invoices</h6>
             <h3>{invoices.length}</h3>
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card">
+          <Card className="summary-card1">
             <h6>Total Sales</h6>
             <h3>₹{totalSales.toFixed(2)}</h3>
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card">
+          <Card className="summary-card1">
             <h6>Average Sale</h6>
             <h3>
               ₹{invoices.length ? (totalSales / invoices.length).toFixed(2) : 0}
@@ -82,7 +82,7 @@ const Home = () => {
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card">
+          <Card className="summary-card1">
             <h6>Total Profit</h6>
             <h3>₹{totalProfit.toFixed(2)}</h3>
           </Card>

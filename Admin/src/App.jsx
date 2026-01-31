@@ -34,9 +34,12 @@ const AppContent= () => {
   const hideSidebar = location.pathname === "/";
 
   return (
-    <>
+    
+    <div className="layout">
+    
       {!hideSidebar && <Sidebar />}
 
+<div className="page-content">
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/home" element={<Home />} />
@@ -60,7 +63,8 @@ const AppContent= () => {
         <Route path="/purchasebill" element={<PurchaseBill />} />
         <Route path="/stocks" element={<Stocks />} />
       </Routes>
-    </>
+    </div>
+    </div>
   );
 };
 

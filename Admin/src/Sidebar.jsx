@@ -68,7 +68,7 @@ const Sidebar = () => {
 
       {/* Desktop sidebar */}
       <div
-        className="d-none d-md-flex flex-column align-items-start position-fixed p-3"
+        className=" d-md-flex flex-column  position-fixed p-3"
         style={{
           width: "250px",
           height: "100vh",

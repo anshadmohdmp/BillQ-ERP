@@ -1,11 +1,10 @@
 .billing{
-    margin-left: 250px;
-    margin-top: -160px;
+ 
     min-height: 100vh;
     background-color: #3e3e3e;
     display: flex;
     justify-content: center;
-    padding: 60px 0;
+    padding: 10px;
     overflow-y: auto;
 }
 

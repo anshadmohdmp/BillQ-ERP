@@ -63,8 +63,6 @@ const AddSuppliers = () => {
   return (
     <div
       style={{
-        marginLeft: "250px",
-        marginTop: "-160px",
         minHeight: "100vh",
         backgroundColor: "#3e3e3e",
         display: "flex",
