@@ -35,7 +35,7 @@ const AppContent= () => {
 
   return (
     
-    <div className="layout">
+    <div className={`layout ${hideSidebar ? "no-sidebar" : ""}`}>
       {!hideSidebar && <Sidebar />}
 
 <div className="page-content">
