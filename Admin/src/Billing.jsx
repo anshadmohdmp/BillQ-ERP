@@ -5,6 +5,8 @@
   import "./Css/AddProducts.css";
   import "./Css/Billing.css";
   import Select from "react-select";
+  import { Html5Qrcode } from "html5-qrcode";
+
 
 
   const Billing = () => {
@@ -29,6 +31,8 @@
     const [FetchedCustomer, setFetchedCustomers] = useState([]);
     const [CustomerId, setCustomerId] = useState("");
     const [Stocks, setStocks] = useState([])
+    const [showScanner, setShowScanner] = useState(false);
+const html5QrCodeRef = useRef(null);
 
     const wrapperRefs = useRef([]);
 
@@ -261,6 +265,45 @@
       }, 1000);
     };
 
+    const startScanner = (rowIndex) => {
+  setShowScanner(true);
+
+  setTimeout(() => {
+    const scanner = new Html5Qrcode("barcode-scanner");
+    html5QrCodeRef.current = scanner;
+
+    scanner.start(
+      { facingMode: "environment" }, // back camera
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 100 },
+      },
+      (decodedText) => {
+        // ✅ BARCODE SCANNED
+        handleBarcodeChange(rowIndex, decodedText);
+
+        scanner.stop().then(() => {
+          scanner.clear();
+          setShowScanner(false);
+        });
+      },
+      (error) => {
+        // ignore scan errors
+      }
+    );
+  }, 300);
+};
+
+const stopScanner = () => {
+  if (html5QrCodeRef.current) {
+    html5QrCodeRef.current.stop().then(() => {
+      html5QrCodeRef.current.clear();
+      setShowScanner(false);
+    });
+  }
+};
+
+
     // 💾 Submit billing
     const handleSubmit = async () => {
       const validStocks = SelectedStocks.filter(
@@ -456,14 +499,36 @@
                       <tr key={index}>
                         <td>{index + 1}</td>
                         <td>
-                          <Form.Control
-                            type="text"
-                            value={item.barcode}
-                            onChange={(e) => handleBarcodeChange(index, e.target.value)}
-                            placeholder="Enter Barcode"
-                            style={inputStyle}
-                          />
-                        </td>
+  <div style={{ position: "relative" }}>
+    <Form.Control
+      type="text"
+      value={item.barcode}
+      onChange={(e) => handleBarcodeChange(index, e.target.value)}
+      placeholder="Enter Barcode"
+      style={{
+        ...inputStyle,
+        paddingRight: "45px", // 👈 space for camera icon
+      }}
+    />
+
+    <span
+      onClick={() => startScanner(index)}
+      style={{
+        position: "absolute",
+        right: "12px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        cursor: "pointer",
+        fontSize: "18px",
+        color: "#ccc",
+      }}
+      title="Scan Barcode"
+    >
+      📷
+    </span>
+  </div>
+</td>
+
                         <td style={{ position: "relative" }}>
                           <Select
                             value={item.selectedProduct || null}
@@ -649,6 +714,36 @@
               </Modal.Body>
             
           </Modal>
+
+          <Modal show={showScanner} onHide={stopScanner} centered size="lg">
+  <Modal.Body
+    style={{
+      background: "#111",
+      color: "#fff",
+      textAlign: "center",
+    }}
+  >
+    <h5>Scan Barcode</h5>
+
+    <div
+      id="barcode-scanner"
+      style={{
+        width: "100%",
+        minHeight: "300px",
+        marginTop: "15px",
+      }}
+    />
+
+    <Button
+      variant="danger"
+      style={{ marginTop: "15px" }}
+      onClick={stopScanner}
+    >
+      Cancel
+    </Button>
+  </Modal.Body>
+</Modal>
+
 
           {/* Warning */}
           <Modal  show={showWarningModal} onHide={() => setShowWarningModal(false)} centered>

@@ -3,6 +3,8 @@ import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddProducts.css";
+import { Html5Qrcode } from "html5-qrcode";
+
 
 const Addproducts = () => {
   const [Barcode, setBarcode] = useState("");
@@ -15,6 +17,8 @@ const Addproducts = () => {
   const [fetchedCategory, setFetchedCategory] = useState([]);
   const [fetchedUnit, setFetchedUnit] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+const html5QrCodeRef = React.useRef(null);
 
   const navigate = useNavigate();
 
@@ -83,6 +87,42 @@ const Addproducts = () => {
       "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.05)",
   };
 
+  const startBarcodeScanner = () => {
+  setShowScanner(true);
+
+  setTimeout(() => {
+    const scanner = new Html5Qrcode("barcode-reader");
+    html5QrCodeRef.current = scanner;
+
+    scanner.start(
+      { facingMode: "environment" }, // back camera
+      {
+        fps: 10,
+        qrbox: { width: 280, height: 120 },
+      },
+      (decodedText) => {
+        setBarcode(decodedText); // ✅ AUTO-FILL BARCODE
+
+        scanner.stop().then(() => {
+          scanner.clear();
+          setShowScanner(false);
+        });
+      },
+      () => {}
+    );
+  }, 300);
+};
+
+const stopBarcodeScanner = () => {
+  if (html5QrCodeRef.current) {
+    html5QrCodeRef.current.stop().then(() => {
+      html5QrCodeRef.current.clear();
+      setShowScanner(false);
+    });
+  }
+};
+
+
   return (
     <div
       className="Add-products"
@@ -104,16 +144,41 @@ const Addproducts = () => {
 
         <Form className="add-product-form" onSubmit={SubmitData}>
           <div style={{ display: "flex", gap: "20px" }}>
-            <Form.Group className="mb-4">
-              <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Barcode</Form.Label>
-              <Form.Control
-                onChange={(e) => setBarcode(e.target.value)}
-                type="text"
-                placeholder="Enter Barcode"
-                value={Barcode}
-                style={inputStyle}
-              />
-            </Form.Group>
+            <Form.Group className="mb-4" style={{ position: "relative" }}>
+  <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>
+    Barcode
+  </Form.Label>
+
+  <div style={{ position: "relative" }}>
+    <Form.Control
+      onChange={(e) => setBarcode(e.target.value)}
+      type="text"
+      placeholder="Enter Barcode"
+      value={Barcode}
+      style={{
+        ...inputStyle,
+        paddingRight: "45px", // 🔑 space for icon
+      }}
+    />
+
+    <Button
+      variant="link"
+      onClick={startBarcodeScanner}
+      style={{
+        position: "absolute",
+        right: "8px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        padding: "0",
+        fontSize: "16px",
+        color: "#bbb",
+        textDecoration: "none",
+      }}
+    >
+      📷
+    </Button>
+  </div>
+</Form.Group>
 
             <Form.Group style={{ width: "100%" }} className="mb-4">
               <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Product Name</Form.Label>
@@ -250,6 +315,36 @@ const Addproducts = () => {
     </Button>
   </Modal.Body>
 </Modal>
+
+<Modal show={showScanner} onHide={stopBarcodeScanner} centered size="lg">
+  <Modal.Body
+    style={{
+      background: "#111",
+      color: "#fff",
+      textAlign: "center",
+    }}
+  >
+    <h5>Scan Product Barcode</h5>
+
+    <div
+      id="barcode-reader"
+      style={{
+        width: "100%",
+        minHeight: "300px",
+        marginTop: "15px",
+      }}
+    />
+
+    <Button
+      variant="danger"
+      style={{ marginTop: "15px" }}
+      onClick={stopBarcodeScanner}
+    >
+      Cancel
+    </Button>
+  </Modal.Body>
+</Modal>
+
 
     </div>
   );
