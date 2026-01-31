@@ -39,12 +39,15 @@
         .catch(err => console.error(err));
     }, []);
 
+    
+
     useEffect(() => {
-      axios.get("https://billq-erp.onrender.com/Customers")
+      axios.get("https://billq-erp.onrender.com/Customers")    
         .then(res => setFetchedCustomers(res.data))
         .catch(err => console.error(err));
     }, [])
 
+    
     
     
     
@@ -232,6 +235,7 @@
                     <td>${(p.quantity * p.price).toFixed(2)}</td>
                   </tr>
                 `).join("")}
+                
               </tbody>
             </table>
             <section class="summary">
@@ -247,6 +251,7 @@
           </div>
         </body>
       </html>`);
+      
       doc.close();
 
       iframe.contentWindow.focus();
@@ -272,18 +277,23 @@
       const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
       const totalAmount = subtotal + Number(Tax || 0) - Number(Discount || 0);
 
-      const StocksToSave = validStocks.map((p) => {
-        const product = Stocks.find((prod) => prod._id === p.productId);
-        return {
-          Barcode: p.barcode,
-          productId: p.productId,
-          name: p.name,
-          quantity: Number(p.quantity),
-          Unit: p.unit,
-          price: Number(p.price),
-          Cost: product?.cost || 0,
-        };
-      });
+     const StocksToSave = validStocks.map((p) => {
+  const product = Stocks.find((prod) => prod._id === p.productId);
+      
+  return {
+    Barcode: p.barcode,
+    productId: p.productId,
+    name: p.name,
+    Brand: product?.Brand || "",   // ✅ ADD THIS
+    quantity: Number(p.quantity),
+    Unit: p.unit,
+    price: Number(p.price),
+    Cost: product?.cost || 0,
+  };
+});
+
+
+
 
       const billData = {
         InvoiceNumber,

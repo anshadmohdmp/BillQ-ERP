@@ -10,6 +10,7 @@ const InvoiceSchema = new mongoose.Schema({
             Barcode: String,
             productId: String,
             name: String,
+            Brand: String,  
             quantity: Number,
             Unit: String,
             price: Number,
