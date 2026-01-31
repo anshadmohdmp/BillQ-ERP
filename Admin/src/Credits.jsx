@@ -60,7 +60,6 @@ const Credits = () => {
             <Card
                 style={{
                     width: "100%",
-                    maxWidth: "calc(100% - 40px)",
                     background: "#2a2a2a",
                     borderRadius: "20px",
                     padding: "20px",

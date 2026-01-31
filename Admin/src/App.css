@@ -15,10 +15,17 @@
 
 .page-content {
   flex: 1;
-  padding: 0px;
-  margin: 0;
+ 
+  margin-left: 250px;     /* sidebar width */
   overflow-y: auto;
-  padding-left: 250px;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    margin-left: 0;       /* 🔥 THIS FIXES THE GAP */
+       /* space for ☰ button */
+  }
 }
 
 

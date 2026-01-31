@@ -1,11 +1,23 @@
 /* Global safety */
+* {
+  box-sizing: border-box;
+}
 
+body {
+  overflow-x: hidden;
+}
 
 /* Main home wrapper */
 .home {
   min-height: 100vh;
   background: #3e3e3e;
-  padding-left: 250px; /* remove top padding, keep left for sidebar */
+  padding: 20px;
+   /* sidebar space for desktop */
+}
+
+.row {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 /* Title */
@@ -18,16 +30,16 @@
 
 /* Summary cards */
 .summary-card1 {
-  background: #2a2a2a;
-  color: #fff;
-  padding: 20px;
-  border-radius: 15px;
-  height: 100%;
-  box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.7),
-    -4px -4px 10px rgba(255, 255, 255, 0.05);
-  max-width: 250px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .summary-card1 {
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 
@@ -44,5 +56,9 @@
 @media (max-width: 768px) {
   .home {
     padding: 0 15px 20px 15px;
+  }
+
+  .home-title {
+    padding-top: 80px;
   }
 }

@@ -312,27 +312,7 @@ const Unit = () => {
           </Button>
         </Modal.Body>
       </Modal>
-
-      {/* Responsive CSS */}
-      <style jsx="true">{`
-        @media (max-width: 768px) {
-          .responsive-card {
-            padding: 20px !important;
-            margin-left: 10px !important;
-            margin-right: 10px !important;
-          }
-
-          input,
-          select,
-          button {
-            width: 100% !important;
-          }
-
-          table {
-            font-size: 14px !important;
-          }
-        }
-      `}</style>
+      
     </div>
   );
 };

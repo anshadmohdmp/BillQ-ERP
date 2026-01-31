@@ -242,7 +242,7 @@ const AddCategory = () => {
         style={{
           width: "100%",
           maxWidth: "1100px",
-          padding: "40px",
+          padding: "20px",
           borderRadius: "20px",
           background: "#2a2a2a",
           boxShadow: "8px 8px 16px rgba(0,0,0,0.7), -4px -4px 12px rgba(255,255,255,0.05)",

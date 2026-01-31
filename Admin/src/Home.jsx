@@ -55,25 +55,43 @@ const Home = () => {
 
   return (
     <div className="home">
-      <h2 className="home-title">BillQ</h2>
+      <h2 className="home-title">Bill<span style={{color:"rgb(205, 162, 7)"}}>Q</span></h2>
 
-      <Row className="g-3 mb-4">
-        <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card1">
+      <Row className="g-3 mb-4" >
+        <Col xs={12} sm={6} md={4} lg={3}>
+          <Card className="summary-card1" style={{
+  background: "#2a2a2a",
+  color: "#fff",
+  padding: "40px",
+  borderRadius: "15px",
+  boxShadow: "6px 6px 14px rgba(0, 0, 0, 0.7), -4px -4px 10px rgba(255, 255, 255, 0.05)",
+      }}>
             <h6>Total Invoices</h6>
             <h3>{invoices.length}</h3>
           </Card>
         </Col>
 
-        <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card1">
+        <Col xs={12} sm={6} md={4} lg={3} >
+          <Card className="summary-card1" style={{
+  background: "#2a2a2a",
+  color: "#fff",
+  padding: "40px",
+  borderRadius: "15px",
+  boxShadow: "6px 6px 14px rgba(0, 0, 0, 0.7), -4px -4px 10px rgba(255, 255, 255, 0.05)",
+      }}>
             <h6>Total Sales</h6>
             <h3>₹{totalSales.toFixed(2)}</h3>
           </Card>
         </Col>
 
-        <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card1">
+        <Col xs={12} sm={6} md={4} lg={3}>
+          <Card className="summary-card1" style={{
+  background: "#2a2a2a",
+  color: "#fff",
+  padding: "40px",
+  borderRadius: "15px",
+  boxShadow: "6px 6px 14px rgba(0, 0, 0, 0.7), -4px -4px 10px rgba(255, 255, 255, 0.05)",
+      }}>
             <h6>Average Sale</h6>
             <h3>
               ₹{invoices.length ? (totalSales / invoices.length).toFixed(2) : 0}
@@ -81,8 +99,14 @@ const Home = () => {
           </Card>
         </Col>
 
-        <Col xs={12} sm={6} md={3}>
-          <Card className="summary-card1">
+        <Col xs={12} sm={6} md={4} lg={3}>
+          <Card className="summary-card1" style={{
+  background: "#2a2a2a",
+  color: "#fff",
+  padding: "40px",
+  borderRadius: "15px",
+  boxShadow: "6px 6px 14px rgba(0, 0, 0, 0.7), -4px -4px 10px rgba(255, 255, 255, 0.05)",
+      }}>
             <h6>Total Profit</h6>
             <h3>₹{totalProfit.toFixed(2)}</h3>
           </Card>

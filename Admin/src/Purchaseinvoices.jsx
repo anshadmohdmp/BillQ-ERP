@@ -29,7 +29,7 @@ const Purchaseinvoices = () => {
     <div className="purchaseinvoices">
     
 
-      <Card style={{ width: "100%", maxWidth: "calc(100% - 40px)", background: "#2a2a2a", borderRadius: "20px", padding: "20px", boxShadow: "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)", color: "#fff", overflow: "hidden" }}>
+      <Card style={{ width: "100%", background: "#2a2a2a", borderRadius: "20px", padding: "20px", boxShadow: "8px 8px 16px rgba(0,0,0,0.7), -8px -8px 16px rgba(255,255,255,0.05)", color: "#fff", overflow: "hidden" }}>
         <h2 style={{ color: "#e6e6e6", textShadow: "0 0 6px rgba(255,255,255,0.1)", marginBottom: "20px" }}>Invoices</h2>
         <div style={{ overflowX: "auto" }}>
           <Table striped bordered hover variant="dark" style={{ width: "100%", background: "#3a3a3a", borderRadius: "15px", boxShadow: "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.05)", tableLayout: "auto", whiteSpace: "nowrap" }}>

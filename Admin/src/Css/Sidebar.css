@@ -1,9 +1,20 @@
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e1e1e, #2c2c2c);
+  overflow-y: auto;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+
 .billq {
   color: white;
+  cursor: pointer;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .billq:hover {
-  color: rgb(0, 20, 236);
   transform: scale(1.1);
 }
 
@@ -14,39 +25,24 @@
 
 .navlinks:hover {
   color: rgb(205, 162, 7);
-  border-radius: 10px;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
-/* 🔥 Active nav link turns red */
 .active-link {
   color: rgb(205, 162, 7) !important;
   font-weight: 700;
-  transform: scale(1.1);
 }
 
-/* Custom Scrollbar for Sidebar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
 }
 
-::-webkit-scrollbar-thumb {
+.sidebar::-webkit-scrollbar-thumb {
   background: #555;
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #888;
-}
-
-::-webkit-scrollbar-track {
+.sidebar::-webkit-scrollbar-track {
   background: #2c2c2c;
-}
-
-@media (max-width: 768px) {
-
-  .navlinks1{
-    color: rgb(0, 0, 0) !important;
-  }
-
 }
