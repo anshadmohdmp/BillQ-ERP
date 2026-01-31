@@ -58,8 +58,8 @@ const Home = () => {
       <h2 className="home-title">Bill<span style={{color:"rgb(205, 162, 7)"}}>Q</span></h2>
 
       <Row className="g-3 mb-4" >
-        <Col xs={12} sm={6} md={4} lg={3}>
-          <Card className="summary-card1" style={{
+        <Col xs={12} sm={6} md={4} lg={3} className="d-flex justify-content-center">
+          <Card className="summary-card" style={{
   background: "#2a2a2a",
   color: "#fff",
   padding: "40px",
@@ -71,8 +71,8 @@ const Home = () => {
           </Card>
         </Col>
 
-        <Col xs={12} sm={6} md={4} lg={3} >
-          <Card className="summary-card1" style={{
+        <Col xs={12} sm={6} md={4} lg={3} className="d-flex justify-content-center">
+          <Card className="summary-card" style={{
   background: "#2a2a2a",
   color: "#fff",
   padding: "40px",
@@ -84,8 +84,8 @@ const Home = () => {
           </Card>
         </Col>
 
-        <Col xs={12} sm={6} md={4} lg={3}>
-          <Card className="summary-card1" style={{
+        <Col xs={12} sm={6} md={4} lg={3} className="d-flex justify-content-center">
+          <Card className="summary-card" style={{
   background: "#2a2a2a",
   color: "#fff",
   padding: "40px",
@@ -99,8 +99,8 @@ const Home = () => {
           </Card>
         </Col>
 
-        <Col xs={12} sm={6} md={4} lg={3}>
-          <Card className="summary-card1" style={{
+        <Col xs={12} sm={6} md={4} lg={3} className="d-flex justify-content-center">
+          <Card className="summary-card" style={{
   background: "#2a2a2a",
   color: "#fff",
   padding: "40px",
@@ -113,24 +113,30 @@ const Home = () => {
         </Col>
       </Row>
 
-      <Card className="chart-card">
-        <h6>Sales Report</h6>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={salesData}>
-            <CartesianGrid stroke="#444" strokeDasharray="3 3" />
-            <XAxis dataKey="date" tick={{ fill: "#fff" }} />
-            <YAxis tick={{ fill: "#fff" }} />
-            <Tooltip
-              contentStyle={{
-                background: "#2a2a2a",
-                border: "none",
-                color: "#fff",
-              }}
-            />
-            <Bar dataKey="sales" fill="#00bfff" />
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>
+      <Row className="mb-4">
+  <Col xs={12} className="d-flex justify-content-center">
+    <Card className="chart-card">
+      <h6>Sales Report</h6>
+
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={salesData}>
+          <CartesianGrid stroke="#444" strokeDasharray="3 3" />
+          <XAxis dataKey="date" tick={{ fill: "#fff" }} />
+          <YAxis tick={{ fill: "#fff" }} />
+          <Tooltip
+            contentStyle={{
+              background: "#2a2a2a",
+              border: "none",
+              color: "#fff",
+            }}
+          />
+          <Bar dataKey="sales" fill="#00bfff" />
+        </BarChart>
+      </ResponsiveContainer>
+    </Card>
+  </Col>
+</Row>
+
     </div>
   );
 };

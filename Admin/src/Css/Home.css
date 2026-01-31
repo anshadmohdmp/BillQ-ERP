@@ -11,54 +11,39 @@ body {
 .home {
   min-height: 100vh;
   background: #3e3e3e;
-  padding: 20px;
+  padding: 20px 40px;
    /* sidebar space for desktop */
 }
 
-.row {
-  margin-left: 0;
-  margin-right: 0;
-}
+
 
 /* Title */
 .home-title {
   color: #e6e6e6;
   margin: 0 0 20px 0;
-  padding-top: 0;
+  padding-top: 40px !important;
   margin-top: 0;
 }
 
 /* Summary cards */
-.summary-card1 {
+.summary-card {
+  width: 100%;
+  max-width: 260px;
+}
+
+.chart-card {
   width: 100%;
   max-width: 100%;
+  overflow-x: auto;
 }
 
-@media (min-width: 768px) {
-  .summary-card1 {
-    max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-
-
-/* Chart */
-.chart-card {
-  background: #2a2a2a;
-  color: #fff;
-  padding: 20px;
-  border-radius: 15px;
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .home {
-    padding: 0 15px 20px 15px;
+@media (max-width: 1400px) {
+  .summary-card {
+    max-width: 400px !important;
   }
 
-  .home-title {
-    padding-top: 80px;
+  .home-title{
+    padding-top: 60px;
   }
+
 }
