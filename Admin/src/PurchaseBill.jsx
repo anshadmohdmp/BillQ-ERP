@@ -431,6 +431,7 @@ const PurchaseBill = () => {
                           style={{
                             ...inputStyle,
                             paddingRight: "45px",
+                            width: "180px",
                           }}
                         />
 
@@ -500,7 +501,7 @@ const PurchaseBill = () => {
                         type="number"
                         value={item.quantity}
                         onChange={(e) => handleQuantityChange(index, e.target.value)}
-                        style={inputStyle}
+                        style={{...inputStyle, width: "80px"}}
                       />
                     </td>
                     <td>{item.unit}</td>
@@ -510,7 +511,7 @@ const PurchaseBill = () => {
                         value={item.cost}
                         onChange={(e) => handleCostChange(index, e.target.value)}
                         placeholder="Cost"
-                        style={inputStyle}
+                        style={{...inputStyle, width: "60px"}}
                       />
                     </td>
                     <td>
@@ -519,7 +520,7 @@ const PurchaseBill = () => {
                         value={item.tax}
                         onChange={(e) => handleTaxChange(index, e.target.value)}
                         placeholder="Tax %"
-                        style={inputStyle}
+                        style={{...inputStyle, width: "60px"}}
                       />
                     </td>
                     <td>{item.rate.toFixed(2)}</td>
@@ -529,7 +530,7 @@ const PurchaseBill = () => {
                         value={item.MRP}
                         onChange={(e) => handleMRPChange(index, e.target.value)}
                         placeholder="MRP"
-                        style={inputStyle}
+                        style={{...inputStyle, width: "60px"}}
                       />
                     </td>
                     <td>{item.total}</td>
