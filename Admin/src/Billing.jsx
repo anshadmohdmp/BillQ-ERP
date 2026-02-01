@@ -324,75 +324,91 @@ const Billing = () => {
 
   // 💾 Submit billing
   const handleSubmit = async () => {
-    const validStocks = SelectedStocks.filter(
-      (p) => p.productId && p.quantity > 0 && p.price > 0
-    );
+  const validStocks = SelectedStocks.filter(
+    (p) => p.productId && p.quantity > 0 && p.price > 0
+  );
 
-    if (!CustomerName.trim() || validStocks.length === 0) {
-      setShowModal(false);
-      setShowWarningModal(true);
-      return;
+  if (!CustomerName.trim() || validStocks.length === 0) {
+    setShowModal(false);
+    setShowWarningModal(true);
+    return;
+  }
+
+  // 🛑 Check stock availability before submitting
+  const outOfStockItems = [];
+  validStocks.forEach((p) => {
+    const stockItem = Stocks.find((s) => s.productId === p.productId && s.Brand === (p.Brand || ""));
+    const availableQty = stockItem?.quantity || 0;
+    if (p.quantity > availableQty) {
+      outOfStockItems.push({ name: p.name, requested: p.quantity, available: availableQty });
     }
+  });
 
-    const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
-    const totalAmount = subtotal + Number(Tax || 0) - Number(Discount || 0);
+  if (outOfStockItems.length > 0) {
+    const message = outOfStockItems
+      .map((i) => `${i.name} (Requested: ${i.requested}, Available: ${i.available})`)
+      .join("\n");
 
-    const StocksToSave = validStocks.map((p) => {
-      const product = Stocks.find((prod) => prod._id === p.productId);
+    alert(`❌ Cannot create invoice. Insufficient stock for:\n${message}`);
+    return; // stop submission
+  }
 
-      return {
-        Barcode: p.barcode,
-        productId: p.productId,
-        name: p.name,
-        Brand: product?.Brand || "",   // ✅ ADD THIS
-        quantity: Number(p.quantity),
-        Unit: p.unit,
-        price: Number(p.price),
-        Cost: product?.cost || 0,
-      };
-    });
+  // Calculate totals
+  const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
+  const totalAmount = subtotal + Number(Tax || 0) - Number(Discount || 0);
 
-
-
-
-    const billData = {
-      InvoiceNumber,
-      date,
-      CustomerName,
-      CustomerNumber,
-      Stocks: StocksToSave,
-      Subtotal: subtotal,
-      Tax,
-      Discount, // 🆕
-      PaymentMethod,
-      TotalAmount: totalAmount,
+  const StocksToSave = validStocks.map((p) => {
+    const product = Stocks.find((prod) => prod._id === p.productId);
+    return {
+      Barcode: p.barcode,
+      productId: p.productId,
+      name: p.name,
+      Brand: product?.Brand || "",   // include Brand
+      quantity: Number(p.quantity),
+      Unit: p.unit,
+      price: Number(p.price),
+      Cost: product?.cost || 0,
     };
+  });
 
-    try {
-      await axios.post("https://billq-erp.onrender.com/createinvoice", billData);
-      setShowModal(false);
-      setShowSuccessModal(true);
-
-      // Reset form fields
-      setCustomerName("");
-      setCustomerNumber("");
-      setCustomerId(""); // ✅ Reset selected customer
-      setSelectedStocks([
-        { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, discount: 0, total: 0, search: "", showSuggestions: false },
-      ]);
-      setSubTotal(0);
-      setTax(0);
-      setDiscount(0);
-      setTotalAmount(0);
-      setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
-
-      handlePrint(billData);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to save billing.");
-    }
-
+  const billData = {
+    InvoiceNumber,
+    date,
+    CustomerName,
+    CustomerNumber,
+    Stocks: StocksToSave,
+    Subtotal: subtotal,
+    Tax,
+    Discount,
+    PaymentMethod,
+    TotalAmount: totalAmount,
   };
+
+  try {
+    await axios.post("https://billq-erp.onrender.com/createinvoice", billData);
+    setShowModal(false);
+    setShowSuccessModal(true);
+
+    // Reset form
+    setCustomerName("");
+    setCustomerNumber("");
+    setCustomerId("");
+    setSelectedStocks([
+      { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, discount: 0, total: 0, search: "", showSuggestions: false },
+    ]);
+    setSubTotal(0);
+    setTax(0);
+    setDiscount(0);
+    setTotalAmount(0);
+    setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
+
+    handlePrint(billData);
+  } catch (error) {
+    console.error(error);
+    alert("Failed to save billing.");
+  }
+};
+
 
   const inputStyle = {
     border: "none",
