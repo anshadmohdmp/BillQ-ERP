@@ -188,13 +188,27 @@ app.post("/createinvoice", async (req, res) => {
     for (const item of Stocks) {
       if (!item?.productId || !item?.quantity) continue;
 
+      console.log('🔎 Deducting stock for:', {
+        productId: item.productId,
+        quantityToDeduct: item.quantity
+      });
+
       const stock = await StockModel.findOne({
         productId: item.productId
       });
 
-      if (!stock) continue;
+      if (!stock) {
+        console.log('❌ No stock found for productId:', item.productId);
+        continue;
+      }
+
+      console.log('✅ Stock found:', {
+        productId: stock.productId,
+        currentQuantity: stock.quantity
+      });
 
       if (stock.quantity < item.quantity) {
+        console.log('❌ Insufficient stock for', item.productId, 'Requested:', item.quantity, 'Available:', stock.quantity);
         return res.status(400).json({
           message: `Insufficient stock for ${item.name}`,
         });
@@ -202,6 +216,7 @@ app.post("/createinvoice", async (req, res) => {
 
       stock.quantity -= item.quantity;
       await stock.save();
+      console.log('✅ Stock updated. New quantity:', stock.quantity);
     }
 
     res.status(200).json({ message: "Invoice created successfully" });
