@@ -190,17 +190,16 @@ app.post("/createinvoice", async (req, res) => {
       if (!item?.productId || !item?.quantity) continue;
 
       const updatedStock = await StockModel.findOneAndUpdate(
-        {
-          productId: item.productId,
-          cost: item.Cost,
-          Brand: item.Brand || null,
-          quantity: { $gte: item.quantity }, // ✅ prevents negative stock
-        },
-        {
-          $inc: { quantity: -item.quantity },
-        },
-        { new: true }
-      );
+  {
+    productId: item.productId,
+    cost: item.Cost,
+    Brand: item.Brand || "",
+    quantity: { $gte: item.quantity },
+  },
+  { $inc: { quantity: -item.quantity } },
+  { new: true }
+);
+
 
       if (!updatedStock) {
         // ❌ rollback invoice if stock fails
@@ -383,7 +382,7 @@ app.post("/createpurchaseinvoice", async (req, res) => {
       const stock = await StockModel.findOne({
         productId: item.productId,
         cost: item.Cost,
-        Brand: item.Brand || null,
+        Brand: item.Brand || "",
       });
 
       if (stock) {
@@ -400,7 +399,7 @@ app.post("/createpurchaseinvoice", async (req, res) => {
           MRP: item.MRP,
           Unit: item.Unit,
           Barcode: item.Barcode,
-          Brand: item.Brand || null,
+          Brand: item.Brand || "",
         });
       }
     }
