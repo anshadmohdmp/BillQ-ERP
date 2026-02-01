@@ -143,12 +143,10 @@ app.post("/createinvoice", async (req, res) => {
       Discount,
     } = req.body;
 
-    // 1️⃣ Basic validation
     if (!InvoiceNumber) return res.status(400).json({ message: "InvoiceNumber missing" });
     if (!Array.isArray(Stocks) || Stocks.length === 0)
       return res.status(400).json({ message: "Stocks array invalid" });
 
-    // 2️⃣ Save Invoice
     const invoice = new Invoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
@@ -163,10 +161,9 @@ app.post("/createinvoice", async (req, res) => {
     });
     await invoice.save();
 
-    // 3️⃣ Save to Credits if PaymentMethod is Credit
     if (PaymentMethod === "Credit") {
       const credit = new Credits({
-        _id: invoice._id, // reuse invoice _id
+        _id: invoice._id,
         InvoiceNumber,
         date: date ? new Date(date) : new Date(),
         CustomerName: CustomerName || "Walk-in",
@@ -181,29 +178,38 @@ app.post("/createinvoice", async (req, res) => {
       await credit.save();
     }
 
-    // 4️⃣ Deduct stock quantities robustly
+    // Deduct stock properly
+    const stockIssues = [];
     for (const item of Stocks) {
       if (!item.productId || !item.quantity) continue;
 
-      const deductQty = Number(item.quantity);
-      if (isNaN(deductQty) || deductQty <= 0) continue;
+      let remainingQty = Number(item.quantity);
+      const stocks = await StockModel.find({
+        productId: item.productId,
+        quantity: { $gt: 0 }, // only consider stock with quantity left
+      });
 
-      // Find stock by productId (brand optional)
-      const stock = await StockModel.findOne({ productId: item.productId });
-      if (!stock) {
-        console.warn(`⚠️ Stock not found for ${item.name} (productId: ${item.productId})`);
-        continue; // skip deduction if not found
+      if (!stocks.length) {
+        stockIssues.push(`${item.name} is out of stock`);
+        continue;
       }
 
-      if (stock.quantity < deductQty) {
-        return res.status(400).json({
-          message: `Insufficient stock for ${item.name} (Available: ${stock.quantity}, Requested: ${deductQty})`,
-        });
+      for (const stock of stocks) {
+        if (remainingQty <= 0) break;
+
+        const deductQty = Math.min(stock.quantity, remainingQty);
+        stock.quantity -= deductQty;
+        remainingQty -= deductQty;
+        await stock.save();
       }
 
-      stock.quantity -= deductQty;
-      await stock.save();
-      console.log(`✅ Stock updated for ${item.name}: remaining ${stock.quantity}`);
+      if (remainingQty > 0) {
+        stockIssues.push(`${item.name} has insufficient stock (remaining: 0)`);
+      }
+    }
+
+    if (stockIssues.length > 0) {
+      return res.status(400).json({ message: "Stock issues", details: stockIssues });
     }
 
     res.status(200).json({ message: "Invoice created and stock updated successfully", invoice });
@@ -212,6 +218,7 @@ app.post("/createinvoice", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 
