@@ -119,44 +119,44 @@ const Billing = () => {
 
 
   const handleBarcodeChange = (index, value) => {
-  const cleanBarcode = value.trim();
+    const cleanBarcode = value.trim();
 
-  const product = Stocks.find(
-    (p) => String(p.Barcode).trim() === cleanBarcode
-  );
+    const product = Stocks.find(
+      (p) => String(p.Barcode).trim() === cleanBarcode
+    );
 
-  const updated = [...SelectedStocks];
+    const updated = [...SelectedStocks];
 
-  if (product) {
-    updated[index] = {
-      ...updated[index],
-      productId: product._id,
-      barcode: cleanBarcode,
-      name: product.name,
-      unit: product.Unit || "",
-      price: product.MRP,
-      quantity: 1,
-      discount: 0,
-      total: product.MRP,
-      search: product.name,
-      showSuggestions: false,
-    };
-  } else {
-    updated[index] = {
-      ...updated[index],
-      barcode: cleanBarcode,
-      productId: "",
-      name: "",
-      unit: "",
-      price: 0,
-      quantity: 1,
-      discount: 0,
-      total: 0,
-    };
-  }
+    if (product) {
+      updated[index] = {
+        ...updated[index],
+        productId: product._id,
+        barcode: cleanBarcode,
+        name: product.name,
+        unit: product.Unit || "",
+        price: product.MRP,
+        quantity: 1,
+        discount: 0,
+        total: product.MRP,
+        search: product.name,
+        showSuggestions: false,
+      };
+    } else {
+      updated[index] = {
+        ...updated[index],
+        barcode: cleanBarcode,
+        productId: "",
+        name: "",
+        unit: "",
+        price: 0,
+        quantity: 1,
+        discount: 0,
+        total: 0,
+      };
+    }
 
-  setSelectedStocks(updated);
-};
+    setSelectedStocks(updated);
+  };
 
 
   const selectProduct = (index, product) => {
@@ -516,44 +516,44 @@ const Billing = () => {
                   return (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                     <td>
-  <div
-    style={{
-      position: "relative",
-      width: "180px",
-    }}
-  >
-    <Form.Control
-      type="text"
-      value={item.barcode}
-      onChange={(e) => handleBarcodeChange(index, e.target.value)}
-      placeholder="Enter Barcode"
-      style={{
-        ...inputStyle,
-        paddingRight: "42px", // space for icon
-        height: "47px", width: "100%",
-      }}
-    />
+                      <td>
+                        <div
+                          style={{
+                            position: "relative",
+                            width: "180px",
+                          }}
+                        >
+                          <Form.Control
+                            type="text"
+                            value={item.barcode}
+                            onChange={(e) => handleBarcodeChange(index, e.target.value)}
+                            placeholder="Enter Barcode"
+                            style={{
+                              ...inputStyle,
+                              paddingRight: "42px", // space for icon
+                              height: "47px", width: "100%",
+                            }}
+                          />
 
-    <div
-      onClick={() => startScanner(index)}
-      style={{
-        position: "absolute",
-        right: "10px",
-        top: "0",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        cursor: "pointer",
-        color: "#bbb",
-        zIndex: 5,
-      }}
-      title="Scan barcode"
-    >
-      📷
-    </div>
-  </div>
-</td>
+                          <div
+                            onClick={() => startScanner(index)}
+                            style={{
+                              position: "absolute",
+                              right: "10px",
+                              top: "0",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              cursor: "pointer",
+                              color: "#bbb",
+                              zIndex: 5,
+                            }}
+                            title="Scan barcode"
+                          >
+                            📷
+                          </div>
+                        </div>
+                      </td>
 
 
                       <td style={{ position: "relative" }}>
@@ -569,6 +569,8 @@ const Billing = () => {
                           }))}
                           placeholder="Search or Select Product..."
                           isSearchable={true}
+                          menuPortalTarget={document.body}   // ✅ KEY FIX
+                          menuPosition="fixed"
                           filterOption={(option, inputValue) => {
                             const search = inputValue.toLowerCase();
                             const [name, barcode] = option.label.toLowerCase().split("(");
@@ -593,17 +595,29 @@ const Billing = () => {
                             }),
                             singleValue: (base) => ({ ...base, color: "#fff" }),
                             placeholder: (base) => ({ ...base, color: "#aaa" }),
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 9999, // 🔥 ensure it's on top
+                            }),
                             menu: (base) => ({
                               ...base,
                               backgroundColor: "#2e2e2e",
                               color: "#fff",
                               zIndex: 20,
                             }),
+                            menuList: (base) => ({
+                              ...base,
+                              maxHeight: "260px",
+                              overflowY: "auto",
+                              paddingTop: 0,
+                              paddingBottom: 0,
+                            }),
                             option: (base, state) => ({
                               ...base,
                               backgroundColor: state.isFocused ? "#555" : "#2e2e2e",
                               color: "#fff",
                               cursor: "pointer",
+                              padding: "10px 12px",
                             }),
                           }}
                         />
@@ -617,7 +631,7 @@ const Billing = () => {
                           type="number"
                           value={item.quantity}
                           onChange={(e) => handleQuantityChange(index, e.target.value)}
-                          style={{...inputStyle, width: "80px"}}
+                          style={{ ...inputStyle, width: "80px" }}
                         />
                       </td>
                       <td>{item.unit}</td>
@@ -629,7 +643,7 @@ const Billing = () => {
                           type="number"
                           value={item.discount}
                           onChange={(e) => handleRowDiscountChange(index, e.target.value)}
-                          style={{...inputStyle, width: "80px"}}
+                          style={{ ...inputStyle, width: "80px" }}
                         />
                       </td>
                       <td>

@@ -467,6 +467,8 @@ const PurchaseBill = () => {
                         }))}
                         placeholder="Search or Select Product..."
                         isSearchable
+                        menuPortalTarget={document.body}   // ✅ KEY FIX
+                        menuPosition="fixed"
                         styles={{
                           control: (base, state) => ({
                             ...base,
@@ -481,17 +483,30 @@ const PurchaseBill = () => {
                           input: (base) => ({ ...base, color: "#fff" }),
                           singleValue: (base) => ({ ...base, color: "#fff" }),
                           placeholder: (base) => ({ ...base, color: "#aaa" }),
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999, // 🔥 ensure it's on top
+                          }),
                           menu: (base) => ({
                             ...base,
                             backgroundColor: "#2e2e2e",
                             color: "#fff",
+
                             zIndex: 20,
+                          }),
+                          menuList: (base) => ({
+                            ...base,
+                            maxHeight: "260px",
+                            overflowY: "auto",
+                            paddingTop: 0,
+                            paddingBottom: 0,
                           }),
                           option: (base, state) => ({
                             ...base,
                             backgroundColor: state.isFocused ? "#555" : "#2e2e2e",
                             color: "#fff",
                             cursor: "pointer",
+                            padding: "10px 12px",
                           }),
                         }}
                       />
@@ -501,7 +516,7 @@ const PurchaseBill = () => {
                         type="number"
                         value={item.quantity}
                         onChange={(e) => handleQuantityChange(index, e.target.value)}
-                        style={{...inputStyle, width: "80px"}}
+                        style={{ ...inputStyle, width: "80px" }}
                       />
                     </td>
                     <td>{item.unit}</td>
@@ -511,7 +526,7 @@ const PurchaseBill = () => {
                         value={item.cost}
                         onChange={(e) => handleCostChange(index, e.target.value)}
                         placeholder="Cost"
-                        style={{...inputStyle, width: "60px"}}
+                        style={{ ...inputStyle, width: "60px" }}
                       />
                     </td>
                     <td>
@@ -520,7 +535,7 @@ const PurchaseBill = () => {
                         value={item.tax}
                         onChange={(e) => handleTaxChange(index, e.target.value)}
                         placeholder="Tax %"
-                        style={{...inputStyle, width: "60px"}}
+                        style={{ ...inputStyle, width: "60px" }}
                       />
                     </td>
                     <td>{item.rate.toFixed(2)}</td>
@@ -530,7 +545,7 @@ const PurchaseBill = () => {
                         value={item.MRP}
                         onChange={(e) => handleMRPChange(index, e.target.value)}
                         placeholder="MRP"
-                        style={{...inputStyle, width: "60px"}}
+                        style={{ ...inputStyle, width: "60px" }}
                       />
                     </td>
                     <td>{item.total}</td>
