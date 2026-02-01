@@ -124,6 +124,7 @@ app.delete("/suppliers/:id", async (req, res) => {
 });
 
 // Invoice
+// CREATE INVOICE - FULL FIX
 app.post("/createinvoice", async (req, res) => {
   try {
     console.log("📥 Incoming invoice:", req.body);
@@ -142,12 +143,9 @@ app.post("/createinvoice", async (req, res) => {
     } = req.body;
 
     // 1️⃣ Basic validation
-    if (!InvoiceNumber) {
-      return res.status(400).json({ message: "InvoiceNumber missing" });
-    }
-    if (!Array.isArray(Stocks) || Stocks.length === 0) {
+    if (!InvoiceNumber) return res.status(400).json({ message: "InvoiceNumber missing" });
+    if (!Array.isArray(Stocks) || Stocks.length === 0)
       return res.status(400).json({ message: "Stocks array invalid" });
-    }
 
     // 2️⃣ Save Invoice
     const invoice = new Invoice({
@@ -182,39 +180,41 @@ app.post("/createinvoice", async (req, res) => {
       await credit.save();
     }
 
-    // 4️⃣ Deduct stock quantities (robust)
+    // 4️⃣ Deduct stock quantities robustly
     for (const item of Stocks) {
       if (!item.productId || !item.quantity) continue;
 
-      // Find stock by productId + Brand (ignore cost to avoid mismatches)
+      // ✅ Find stock by productId and brand (case-insensitive)
       const stock = await StockModel.findOne({
         productId: item.productId,
-        Brand: item.Brand || "",
+        Brand: { $regex: `^${item.Brand || ""}$`, $options: "i" },
       });
 
       if (!stock) {
-        console.warn(`⚠️ Stock not found for product: ${item.name}, Brand: ${item.Brand}`);
-        continue; // skip deduction
+        console.warn(`⚠️ Stock not found for ${item.name} (Brand: ${item.Brand})`);
+        continue; // skip deduction if not found
       }
 
       const deductQty = Number(item.quantity);
+
       if (stock.quantity < deductQty) {
         return res.status(400).json({
-          message: `Insufficient stock for ${item.name} (Available: ${stock.quantity}, Required: ${deductQty})`,
+          message: `Insufficient stock for ${item.name} (Available: ${stock.quantity}, Requested: ${deductQty})`,
         });
       }
 
       stock.quantity -= deductQty;
       await stock.save();
-      console.log(`✅ Stock updated for ${item.name}: remaining ${stock.quantity}`);
+      console.log(`✅ Stock updated for ${item.name} (Brand: ${item.Brand}): remaining ${stock.quantity}`);
     }
 
-    res.status(200).json({ message: "Invoice created and stock updated successfully" });
+    res.status(200).json({ message: "Invoice created and stock updated successfully", invoice });
   } catch (error) {
     console.error("❌ ERROR creating invoice:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 
