@@ -323,7 +323,7 @@ const Billing = () => {
 
 
   // 💾 Submit billing
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
   const validStocks = SelectedStocks.filter(
     (p) => p.productId && p.quantity > 0 && p.price > 0
   );
@@ -334,10 +334,11 @@ const Billing = () => {
     return;
   }
 
-  // 🛑 Check stock availability before submitting
+  // 🔹 Check stock availability
   const outOfStockItems = [];
   validStocks.forEach((p) => {
-    const stockItem = Stocks.find((s) => s.productId === p.productId && s.Brand === (p.Brand || ""));
+    // Match stock by productId only
+    const stockItem = Stocks.find((s) => s._id === p.productId || s.productId === p.productId);
     const availableQty = stockItem?.quantity || 0;
     if (p.quantity > availableQty) {
       outOfStockItems.push({ name: p.name, requested: p.quantity, available: availableQty });
@@ -348,12 +349,11 @@ const Billing = () => {
     const message = outOfStockItems
       .map((i) => `${i.name} (Requested: ${i.requested}, Available: ${i.available})`)
       .join("\n");
-
     alert(`❌ Cannot create invoice. Insufficient stock for:\n${message}`);
     return; // stop submission
   }
 
-  // Calculate totals
+  // 🔹 Calculate totals
   const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
   const totalAmount = subtotal + Number(Tax || 0) - Number(Discount || 0);
 
@@ -363,7 +363,7 @@ const Billing = () => {
       Barcode: p.barcode,
       productId: p.productId,
       name: p.name,
-      Brand: product?.Brand || "",   // include Brand
+      Brand: product?.Brand || "",
       quantity: Number(p.quantity),
       Unit: p.unit,
       price: Number(p.price),
@@ -385,11 +385,23 @@ const Billing = () => {
   };
 
   try {
+    // 🔹 Save invoice and update stock on backend
     await axios.post("https://billq-erp.onrender.com/createinvoice", billData);
+
+    // 🔹 Deduct stock quantities in frontend UI
+    const updatedStocks = [...Stocks];
+    StocksToSave.forEach((item) => {
+      const stockIndex = updatedStocks.findIndex(s => s._id === item.productId || s.productId === item.productId);
+      if (stockIndex !== -1) {
+        updatedStocks[stockIndex].quantity -= item.quantity;
+      }
+    });
+    setStocks(updatedStocks); // update frontend stock numbers
+
     setShowModal(false);
     setShowSuccessModal(true);
 
-    // Reset form
+    // 🔹 Reset form
     setCustomerName("");
     setCustomerNumber("");
     setCustomerId("");
@@ -408,6 +420,7 @@ const Billing = () => {
     alert("Failed to save billing.");
   }
 };
+
 
 
   const inputStyle = {
