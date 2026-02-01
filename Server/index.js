@@ -184,14 +184,12 @@ app.post("/createinvoice", async (req, res) => {
     }
 
 
-    // 3️⃣ Deduct stock quantities
+    // 3️⃣ Deduct stock quantities (match only by productId)
     for (const item of Stocks) {
       if (!item?.productId || !item?.quantity) continue;
 
       const stock = await StockModel.findOne({
-        productId: item.productId,
-        cost: item.Cost,
-        Brand: item.Brand || "",
+        productId: item.productId
       });
 
       if (!stock) continue;
