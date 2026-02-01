@@ -102,6 +102,7 @@ const Billing = () => {
         name: product.name,
         unit: product.Unit || "",
         price: product.MRP,
+         Brand: product.Brand || "",
         quantity: 1,
         total: product.MRP,
         showSuggestions: false,
@@ -137,6 +138,7 @@ const Billing = () => {
         price: product.MRP,
         quantity: 1,
         discount: 0,
+         Brand: product.Brand || "",
         total: product.MRP,
         search: product.name,
         showSuggestions: false,
@@ -152,6 +154,7 @@ const Billing = () => {
         quantity: 1,
         discount: 0,
         total: 0,
+        Brand: "",
       };
     }
 
@@ -173,6 +176,7 @@ const Billing = () => {
       total: product.MRP,
       search: product.name, // ✅ keep search in sync
       showSuggestions: false,
+      Brand: product.Brand || "",
     };
     setSelectedStocks(updated);
   };
@@ -189,7 +193,7 @@ const Billing = () => {
 
 
   const addRow = () => {
-    setSelectedStocks([...SelectedStocks, { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, total: 0, search: "", showSuggestions: false }]);
+    setSelectedStocks([...SelectedStocks, { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, total: 0, search: "", showSuggestions: false, Brand: "" }]);
   };
 
   const removeRow = (index) => {
@@ -335,23 +339,26 @@ const Billing = () => {
   }
 
   // 🔹 Check stock availability
-  const outOfStockItems = [];
-  validStocks.forEach((p) => {
-    // Match stock by productId only
-    const stockItem = Stocks.find((s) => s._id === p.productId || s.productId === p.productId);
-    const availableQty = stockItem?.quantity || 0;
-    if (p.quantity > availableQty) {
-      outOfStockItems.push({ name: p.name, requested: p.quantity, available: availableQty });
-    }
-  });
-
-  if (outOfStockItems.length > 0) {
-    const message = outOfStockItems
-      .map((i) => `${i.name} (Requested: ${i.requested}, Available: ${i.available})`)
-      .join("\n");
-    alert(`❌ Cannot create invoice. Insufficient stock for:\n${message}`);
-    return; // stop submission
+ const outOfStockItems = validStocks.map(p => {
+  // Try to find matching stock in Stocks array (frontend)
+  const stockItem = Stocks.find(
+    s => s.productId === p.productId && (s.Brand || "") === (p.Brand || "")
+  );
+  const availableQty = stockItem?.quantity || 0;
+  if (p.quantity > availableQty) {
+    return { name: p.name, requested: p.quantity, available: availableQty };
   }
+  return null;
+}).filter(Boolean);
+
+if (outOfStockItems.length > 0) {
+  const message = outOfStockItems
+    .map(i => `${i.name} (Requested: ${i.requested}, Available: ${i.available})`)
+    .join("\n");
+  alert(`❌ Cannot create invoice. Insufficient stock for:\n${message}`);
+  return;
+}
+
 
   // 🔹 Calculate totals
   const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
