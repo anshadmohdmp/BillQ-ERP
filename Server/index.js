@@ -125,6 +125,7 @@ app.delete("/suppliers/:id", async (req, res) => {
 
 // Invoice
 // CREATE INVOICE - FULL FIX
+// CREATE INVOICE - FULL FIX
 app.post("/createinvoice", async (req, res) => {
   try {
     console.log("📥 Incoming invoice:", req.body);
@@ -184,18 +185,15 @@ app.post("/createinvoice", async (req, res) => {
     for (const item of Stocks) {
       if (!item.productId || !item.quantity) continue;
 
-      // ✅ Find stock by productId and brand (case-insensitive)
-      const stock = await StockModel.findOne({
-        productId: item.productId,
-        Brand: { $regex: `^${item.Brand || ""}$`, $options: "i" },
-      });
+      const deductQty = Number(item.quantity);
+      if (isNaN(deductQty) || deductQty <= 0) continue;
 
+      // Find stock by productId (brand optional)
+      const stock = await StockModel.findOne({ productId: item.productId });
       if (!stock) {
-        console.warn(`⚠️ Stock not found for ${item.name} (Brand: ${item.Brand})`);
+        console.warn(`⚠️ Stock not found for ${item.name} (productId: ${item.productId})`);
         continue; // skip deduction if not found
       }
-
-      const deductQty = Number(item.quantity);
 
       if (stock.quantity < deductQty) {
         return res.status(400).json({
@@ -205,7 +203,7 @@ app.post("/createinvoice", async (req, res) => {
 
       stock.quantity -= deductQty;
       await stock.save();
-      console.log(`✅ Stock updated for ${item.name} (Brand: ${item.Brand}): remaining ${stock.quantity}`);
+      console.log(`✅ Stock updated for ${item.name}: remaining ${stock.quantity}`);
     }
 
     res.status(200).json({ message: "Invoice created and stock updated successfully", invoice });
@@ -214,6 +212,7 @@ app.post("/createinvoice", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 
