@@ -102,7 +102,6 @@ const Billing = () => {
         name: product.name,
         unit: product.Unit || "",
         price: product.MRP,
-         Brand: product.Brand || "",
         quantity: 1,
         total: product.MRP,
         showSuggestions: false,
@@ -138,7 +137,6 @@ const Billing = () => {
         price: product.MRP,
         quantity: 1,
         discount: 0,
-         Brand: product.Brand || "",
         total: product.MRP,
         search: product.name,
         showSuggestions: false,
@@ -154,7 +152,6 @@ const Billing = () => {
         quantity: 1,
         discount: 0,
         total: 0,
-        Brand: "",
       };
     }
 
@@ -176,7 +173,6 @@ const Billing = () => {
       total: product.MRP,
       search: product.name, // ✅ keep search in sync
       showSuggestions: false,
-      Brand: product.Brand || "",
     };
     setSelectedStocks(updated);
   };
@@ -193,7 +189,7 @@ const Billing = () => {
 
 
   const addRow = () => {
-    setSelectedStocks([...SelectedStocks, { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, total: 0, search: "", showSuggestions: false, Brand: "" }]);
+    setSelectedStocks([...SelectedStocks, { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, total: 0, search: "", showSuggestions: false }]);
   };
 
   const removeRow = (index) => {
@@ -327,108 +323,75 @@ const Billing = () => {
 
 
   // 💾 Submit billing
- const handleSubmit = async () => {
-  const validStocks = SelectedStocks.filter(
-    (p) => p.productId && p.quantity > 0 && p.price > 0
-  );
+  const handleSubmit = async () => {
+    const validStocks = SelectedStocks.filter(
+      (p) => p.productId && p.quantity > 0 && p.price > 0
+    );
 
-  if (!CustomerName.trim() || validStocks.length === 0) {
-    setShowModal(false);
-    setShowWarningModal(true);
-    return;
-  }
+    if (!CustomerName.trim() || validStocks.length === 0) {
+      setShowModal(false);
+      setShowWarningModal(true);
+      return;
+    }
 
-  // 🔹 Check stock availability
- const outOfStockItems = validStocks.map(p => {
-  // Try to find matching stock in Stocks array (frontend)
-  const stockItem = Stocks.find(
-    s => s.productId === p.productId && (s.Brand || "") === (p.Brand || "")
-  );
-  const availableQty = stockItem?.quantity || 0;
-  if (p.quantity > availableQty) {
-    return { name: p.name, requested: p.quantity, available: availableQty };
-  }
-  return null;
-}).filter(Boolean);
+    const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
+    const totalAmount = subtotal + Number(Tax || 0) - Number(Discount || 0);
 
-if (outOfStockItems.length > 0) {
-  const message = outOfStockItems
-    .map(i => `${i.name} (Requested: ${i.requested}, Available: ${i.available})`)
-    .join("\n");
-  alert(`❌ Cannot create invoice. Insufficient stock for:\n${message}`);
-  return;
-}
-
-
-  // 🔹 Calculate totals
-  const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
-  const totalAmount = subtotal + Number(Tax || 0) - Number(Discount || 0);
-
-  const StocksToSave = validStocks.map((p) => {
-    const product = Stocks.find((prod) => prod._id === p.productId);
-    return {
-      Barcode: p.barcode,
-      productId: p.productId,
-      name: p.name,
-      Brand: product?.Brand || "",
-      quantity: Number(p.quantity),
-      Unit: p.unit,
-      price: Number(p.price),
-      Cost: product?.cost || 0,
-    };
-  });
-
-  const billData = {
-    InvoiceNumber,
-    date,
-    CustomerName,
-    CustomerNumber,
-    Stocks: StocksToSave,
-    Subtotal: subtotal,
-    Tax,
-    Discount,
-    PaymentMethod,
-    TotalAmount: totalAmount,
-  };
-
-  try {
-    // 🔹 Save invoice and update stock on backend
-    await axios.post("https://billq-erp.onrender.com/createinvoice", billData);
-
-    // 🔹 Deduct stock quantities in frontend UI
-    const updatedStocks = [...Stocks];
-    StocksToSave.forEach((item) => {
-      const stockIndex = updatedStocks.findIndex(s => s._id === item.productId || s.productId === item.productId);
-      if (stockIndex !== -1) {
-        updatedStocks[stockIndex].quantity -= item.quantity;
-      }
+    const StocksToSave = validStocks.map((p) => {
+      const product = Stocks.find((prod) => prod._id === p.productId);
+      return {
+        Barcode: p.barcode,
+        productId: p.productId,
+        name: p.name,
+        Brand: product?.Brand || p.Brand || "",
+        quantity: Number(p.quantity),
+        Unit: p.unit,
+        price: Number(p.price),
+        Cost: product?.cost ?? product?.Cost ?? p.price ?? 0,
+      };
     });
-    setStocks(updatedStocks); // update frontend stock numbers
-
-    setShowModal(false);
-    setShowSuccessModal(true);
-
-    // 🔹 Reset form
-    setCustomerName("");
-    setCustomerNumber("");
-    setCustomerId("");
-    setSelectedStocks([
-      { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, discount: 0, total: 0, search: "", showSuggestions: false },
-    ]);
-    setSubTotal(0);
-    setTax(0);
-    setDiscount(0);
-    setTotalAmount(0);
-    setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
-
-    handlePrint(billData);
-  } catch (error) {
-    console.error(error);
-    alert("Failed to save billing.");
-  }
-};
 
 
+
+
+    const billData = {
+      InvoiceNumber,
+      date,
+      CustomerName,
+      CustomerNumber,
+      Stocks: StocksToSave,
+      Subtotal: subtotal,
+      Tax,
+      Discount, // 🆕
+      PaymentMethod,
+      TotalAmount: totalAmount,
+    };
+
+    try {
+      await axios.post("https://billq-erp.onrender.com/createinvoice", billData);
+      setShowModal(false);
+      setShowSuccessModal(true);
+
+      // Reset form fields
+      setCustomerName("");
+      setCustomerNumber("");
+      setCustomerId(""); // ✅ Reset selected customer
+      setSelectedStocks([
+        { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, discount: 0, total: 0, search: "", showSuggestions: false },
+      ]);
+      setSubTotal(0);
+      setTax(0);
+      setDiscount(0);
+      setTotalAmount(0);
+      setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
+
+      handlePrint(billData);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save billing.");
+    }
+
+  };
 
   const inputStyle = {
     border: "none",

@@ -126,7 +126,7 @@ app.delete("/suppliers/:id", async (req, res) => {
 // Invoice
 app.post("/createinvoice", async (req, res) => {
   try {
-    console.log("📥 Incoming invoice:", req.body);
+    console.log("📥 BODY:", req.body);
 
     const {
       InvoiceNumber,
@@ -141,15 +141,15 @@ app.post("/createinvoice", async (req, res) => {
       Discount,
     } = req.body;
 
-    // 1️⃣ Basic validation
     if (!InvoiceNumber) {
       return res.status(400).json({ message: "InvoiceNumber missing" });
     }
+
     if (!Array.isArray(Stocks) || Stocks.length === 0) {
       return res.status(400).json({ message: "Stocks array invalid" });
     }
 
-    // 2️⃣ Save Invoice
+    // 1️⃣ Save to Invoice collection
     const invoice = new Invoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
@@ -164,10 +164,10 @@ app.post("/createinvoice", async (req, res) => {
     });
     await invoice.save();
 
-    // 3️⃣ Save to Credits if PaymentMethod is Credit
+    // 2️⃣ Save Credit (if PaymentMethod = Credit) using same _id
     if (PaymentMethod === "Credit") {
       const credit = new Credits({
-        _id: invoice._id, // reuse invoice _id
+        _id: invoice._id, // ⚡ reuse Invoice _id
         InvoiceNumber,
         date: date ? new Date(date) : new Date(),
         CustomerName: CustomerName || "Walk-in",
@@ -179,43 +179,42 @@ app.post("/createinvoice", async (req, res) => {
         TotalAmount: Number(TotalAmount || 0),
         Discount: Number(Discount || 0),
       });
+
       await credit.save();
     }
 
-    // 4️⃣ Deduct stock quantities (robust)
-    for (const item of Stocks) {
-      if (!item.productId || !item.quantity) continue;
 
-      // Find stock by productId + Brand (ignore cost to avoid mismatches)
+    // 3️⃣ Deduct stock quantities
+    for (const item of Stocks) {
+      if (!item?.productId || !item?.quantity) continue;
+
       const stock = await StockModel.findOne({
         productId: item.productId,
+        cost: item.Cost,
         Brand: item.Brand || "",
       });
 
-      if (!stock) {
-        console.warn(`⚠️ Stock not found for product: ${item.name}, Brand: ${item.Brand}`);
-        continue; // skip deduction
-      }
+      if (!stock) continue;
 
-      const deductQty = Number(item.quantity);
-      if (stock.quantity < deductQty) {
+      if (stock.quantity < item.quantity) {
         return res.status(400).json({
-          message: `Insufficient stock for ${item.name} (Available: ${stock.quantity}, Required: ${deductQty})`,
+          message: `Insufficient stock for ${item.name}`,
         });
       }
 
-      stock.quantity -= deductQty;
+      stock.quantity -= item.quantity;
       await stock.save();
-      console.log(`✅ Stock updated for ${item.name}: remaining ${stock.quantity}`);
     }
 
-    res.status(200).json({ message: "Invoice created and stock updated successfully" });
+    res.status(200).json({ message: "Invoice created successfully" });
   } catch (error) {
-    console.error("❌ ERROR creating invoice:", error);
-    res.status(500).json({ message: error.message });
+    console.error("❌ ERROR:", error);
+    res.status(500).json({
+      message: error.message,
+      stack: error.stack,
+    });
   }
 });
-
 
 
 app.get("/credits", async (req, res) => {
