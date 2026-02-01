@@ -141,6 +141,7 @@ app.post("/createinvoice", async (req, res) => {
       Discount,
     } = req.body;
 
+    // 🔴 Basic validations
     if (!InvoiceNumber) {
       return res.status(400).json({ message: "InvoiceNumber missing" });
     }
@@ -149,7 +150,7 @@ app.post("/createinvoice", async (req, res) => {
       return res.status(400).json({ message: "Stocks array invalid" });
     }
 
-    // 1️⃣ Save to Invoice collection
+    // 1️⃣ Create Invoice
     const invoice = new Invoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
@@ -162,12 +163,13 @@ app.post("/createinvoice", async (req, res) => {
       TotalAmount: Number(TotalAmount || 0),
       Discount: Number(Discount || 0),
     });
+
     await invoice.save();
 
-    // 2️⃣ Save Credit (if PaymentMethod = Credit) using same _id
+    // 2️⃣ If Credit → Save to Credits collection (same _id)
     if (PaymentMethod === "Credit") {
       const credit = new Credits({
-        _id: invoice._id, // ⚡ reuse Invoice _id
+        _id: invoice._id, // 🔥 SAME ID
         InvoiceNumber,
         date: date ? new Date(date) : new Date(),
         CustomerName: CustomerName || "Walk-in",
@@ -183,38 +185,50 @@ app.post("/createinvoice", async (req, res) => {
       await credit.save();
     }
 
-
-    // 3️⃣ Deduct stock quantities
+    // 3️⃣ Deduct stock (ATOMIC + SAFE)
     for (const item of Stocks) {
       if (!item?.productId || !item?.quantity) continue;
 
-      const stock = await StockModel.findOne({
-        productId: item.productId,
-        cost: item.Cost,
-        Brand: item.Brand || "",
-      });
+      const updatedStock = await StockModel.findOneAndUpdate(
+        {
+          productId: item.productId,
+          cost: item.Cost,
+          Brand: item.Brand || null,
+          quantity: { $gte: item.quantity }, // ✅ prevents negative stock
+        },
+        {
+          $inc: { quantity: -item.quantity },
+        },
+        { new: true }
+      );
 
-      if (!stock) continue;
+      if (!updatedStock) {
+        // ❌ rollback invoice if stock fails
+        await Invoice.findByIdAndDelete(invoice._id);
+        if (PaymentMethod === "Credit") {
+          await Credits.findByIdAndDelete(invoice._id);
+        }
 
-      if (stock.quantity < item.quantity) {
         return res.status(400).json({
           message: `Insufficient stock for ${item.name}`,
         });
       }
-
-      stock.quantity -= item.quantity;
-      await stock.save();
     }
 
-    res.status(200).json({ message: "Invoice created successfully" });
+    // ✅ SUCCESS
+    res.status(201).json({
+      message: "Invoice created & stock updated successfully",
+      invoiceId: invoice._id,
+    });
   } catch (error) {
-    console.error("❌ ERROR:", error);
+    console.error("❌ CREATE INVOICE ERROR:", error);
     res.status(500).json({
-      message: error.message,
-      stack: error.stack,
+      message: "Failed to create invoice",
+      error: error.message,
     });
   }
 });
+
 
 
 app.get("/credits", async (req, res) => {
