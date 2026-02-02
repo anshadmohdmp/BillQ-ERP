@@ -126,8 +126,6 @@ app.delete("/suppliers/:id", async (req, res) => {
 // Invoice
 app.post("/createinvoice", async (req, res) => {
   try {
-    console.log("📥 BODY:", req.body);
-
     const {
       InvoiceNumber,
       date,
@@ -149,7 +147,7 @@ app.post("/createinvoice", async (req, res) => {
       return res.status(400).json({ message: "Stocks array invalid" });
     }
 
-    // 1️⃣ Save to Invoice collection
+    // 1️⃣ Save invoice
     const invoice = new Invoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
@@ -158,96 +156,82 @@ app.post("/createinvoice", async (req, res) => {
       Stocks,
       Subtotal: Number(Subtotal || 0),
       Tax: Number(Tax || 0),
+      Discount: Number(Discount || 0),
       PaymentMethod,
       TotalAmount: Number(TotalAmount || 0),
-      Discount: Number(Discount || 0),
     });
+
     await invoice.save();
 
-    // 2️⃣ Save Credit (if PaymentMethod = Credit) using same _id
+    // 2️⃣ Save credit invoice if needed
     if (PaymentMethod === "Credit") {
-      const credit = new Credits({
-        _id: invoice._id, // ⚡ reuse Invoice _id
+      await Credits.create({
+        _id: invoice._id,
         InvoiceNumber,
-        date: date ? new Date(date) : new Date(),
-        CustomerName: CustomerName || "Walk-in",
-        CustomerNumber: CustomerNumber || "",
+        date: invoice.date,
+        CustomerName,
+        CustomerNumber,
         Stocks,
-        Subtotal: Number(Subtotal || 0),
-        Tax: Number(Tax || 0),
+        Subtotal,
+        Tax,
+        Discount,
         PaymentMethod,
-        TotalAmount: Number(TotalAmount || 0),
-        Discount: Number(Discount || 0),
+        TotalAmount,
       });
-
-      await credit.save();
     }
 
-
-    // 3️⃣ Deduct stock quantities (match only by productId)
+    // 3️⃣ 🔥 DEDUCT STOCK (FIFO)
     for (const item of Stocks) {
       if (!item?.productId || !item?.quantity) continue;
 
-      console.log('🔎 Deducting stock for:', {
+      let remainingQty = Number(item.quantity);
+
+      // 🔍 Get all stock rows for product (FIFO)
+      const stockRows = await StockModel.find({
         productId: item.productId,
-        quantityToDeduct: item.quantity
-      });
+      }).sort({ cost: 1, createdAt: 1 });
 
-
-      let productObjectId;
-      try {
-        productObjectId = typeof item.productId === 'string' ? new mongoose.Types.ObjectId(item.productId) : item.productId;
-      } catch (e) {
-        console.log('❌ Invalid productId:', item.productId, 'Type:', typeof item.productId);
-        continue;
+      if (!stockRows.length) {
+        return res.status(400).json({
+          message: `No stock found for ${item.name}`,
+        });
       }
 
-      console.log('🔍 Looking for stock:', {
-        requestProductId: item.productId,
-        requestProductIdType: typeof item.productId,
-        asObjectId: productObjectId,
-        asObjectIdType: typeof productObjectId
-      });
+      const totalAvailable = stockRows.reduce(
+        (sum, s) => sum + s.quantity,
+        0
+      );
 
-      const stock = await StockModel.findOne({
-        productId: productObjectId
-      });
-
-      if (!stock) {
-        // List all stock productIds for debugging
-        const allStocks = await StockModel.find({}, {productId:1, name:1, quantity:1});
-        console.log('❌ No stock found for productId:', item.productId, 'ObjectId:', productObjectId);
-        console.log('All stock productIds:', allStocks.map(s => ({id: s.productId, name: s.name, quantity: s.quantity})));
-        continue;
-      }
-
-      console.log('✅ Stock found:', {
-        productId: stock.productId,
-        productIdType: typeof stock.productId,
-        currentQuantity: stock.quantity
-      });
-
-      if (stock.quantity < item.quantity) {
-        console.log('❌ Insufficient stock for', item.productId, 'Requested:', item.quantity, 'Available:', stock.quantity);
+      if (totalAvailable < remainingQty) {
         return res.status(400).json({
           message: `Insufficient stock for ${item.name}`,
         });
       }
 
-      stock.quantity -= item.quantity;
-      await stock.save();
-      console.log('✅ Stock updated. New quantity:', stock.quantity);
+      // 🔁 FIFO deduction
+      for (const stock of stockRows) {
+        if (remainingQty <= 0) break;
+
+        if (stock.quantity <= remainingQty) {
+          remainingQty -= stock.quantity;
+          await StockModel.deleteOne({ _id: stock._id });
+        } else {
+          stock.quantity -= remainingQty;
+          remainingQty = 0;
+          await stock.save();
+        }
+      }
     }
 
     res.status(200).json({ message: "Invoice created successfully" });
   } catch (error) {
-    console.error("❌ ERROR:", error);
+    console.error("❌ SALES ERROR:", error);
     res.status(500).json({
       message: error.message,
-      stack: error.stack,
     });
   }
 });
+
 
 
 app.get("/credits", async (req, res) => {
@@ -394,32 +378,30 @@ app.post("/createpurchaseinvoice", async (req, res) => {
     });
 
     await purchase.save();
-    // Add stocks
+
+    // 🔹 ADD STOCK
     for (const item of Stocks) {
       if (!item.productId || !item.quantity) continue;
 
-      // Find existing stock with same product, cost, and brand
-      const stock = await StockModel.findOne({
+      const existingStock = await StockModel.findOne({
         productId: item.productId,
         cost: item.Cost,
         Brand: item.Brand || null,
       });
 
-      if (stock) {
-        // Same product + same cost + same brand → just increment quantity
-        stock.quantity += item.quantity;
-        await stock.save();
+      if (existingStock) {
+        existingStock.quantity += Number(item.quantity);
+        await existingStock.save();
       } else {
-        // Create new stock row
         await StockModel.create({
           productId: item.productId,
           name: item.name,
-          quantity: item.quantity,
-          cost: item.Cost,
-          MRP: item.MRP,
+          quantity: Number(item.quantity),
+          cost: Number(item.Cost),
+          MRP: Number(item.MRP),
           Unit: item.Unit,
           Barcode: item.Barcode,
-          Brand: item.Brand || null,
+          Brand: item.Brand || "",
         });
       }
     }
@@ -430,6 +412,7 @@ app.post("/createpurchaseinvoice", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 
