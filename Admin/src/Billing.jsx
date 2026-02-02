@@ -323,75 +323,93 @@ const Billing = () => {
 
 
   // 💾 Submit billing
-  const handleSubmit = async () => {
-    const validStocks = SelectedStocks.filter(
-      (p) => p.productId && p.quantity > 0 && p.price > 0
+ // 🔻 ONLY SHOWING THE UPDATED handleSubmit PART 🔻
+// (Rest of your component remains SAME)
+
+const handleSubmit = async () => {
+  const validStocks = SelectedStocks.filter(
+    (p) => p.productId && p.quantity > 0 && p.price > 0
+  );
+
+  if (!CustomerName.trim() || validStocks.length === 0) {
+    setShowModal(false);
+    setShowWarningModal(true);
+    return;
+  }
+
+  const subtotal = validStocks.reduce(
+    (acc, p) => acc + p.price * p.quantity,
+    0
+  );
+
+  const totalAmount =
+    subtotal + Number(Tax || 0) - Number(Discount || 0);
+
+  // ✅ FIXED PAYLOAD (NO COST FIELD)
+  const StocksToSave = validStocks.map((p) => {
+    const product = Stocks.find((prod) => prod._id === p.productId);
+    return {
+      Barcode: p.barcode,
+      productId: p.productId,
+      name: p.name,
+      Brand: product?.Brand || "",
+      quantity: Number(p.quantity),
+      Unit: p.unit,
+      price: Number(p.price),
+    };
+  });
+
+  const billData = {
+    InvoiceNumber,
+    date,
+    CustomerName,
+    CustomerNumber,
+    Stocks: StocksToSave,
+    Subtotal: subtotal,
+    Tax,
+    Discount,
+    PaymentMethod,
+    TotalAmount: totalAmount,
+  };
+
+  try {
+    await axios.post(
+      "https://billq-erp.onrender.com/createinvoice",
+      billData
     );
 
-    if (!CustomerName.trim() || validStocks.length === 0) {
-      setShowModal(false);
-      setShowWarningModal(true);
-      return;
-    }
+    setShowModal(false);
+    setShowSuccessModal(true);
 
-    const subtotal = validStocks.reduce((acc, p) => acc + p.price * p.quantity, 0);
-    const totalAmount = subtotal + Number(Tax || 0) - Number(Discount || 0);
+    // Reset
+    setCustomerName("");
+    setCustomerNumber("");
+    setCustomerId("");
+    setSelectedStocks([
+      {
+        productId: "",
+        barcode: "",
+        name: "",
+        unit: "",
+        quantity: 1,
+        price: 0,
+        discount: 0,
+        total: 0,
+      },
+    ]);
+    setSubTotal(0);
+    setTax(0);
+    setDiscount(0);
+    setTotalAmount(0);
+    setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
 
-    const StocksToSave = validStocks.map((p) => {
-      const product = Stocks.find((prod) => prod._id === p.productId);
-      return {
-        Barcode: p.barcode,
-        productId: p.productId,
-        name: p.name,
-        Brand: product?.Brand || p.Brand || "",
-        quantity: Number(p.quantity),
-        Unit: p.unit,
-        price: Number(p.price),
-        Cost: product?.cost ?? product?.Cost ?? p.price ?? 0,
-      };
-    });
+    handlePrint(billData);
+  } catch (error) {
+    console.error("❌ BILLING ERROR:", error.response?.data || error);
+    alert(error.response?.data?.message || "Failed to save billing");
+  }
+};
 
-
-
-
-    const billData = {
-      InvoiceNumber,
-      date,
-      CustomerName,
-      CustomerNumber,
-      Stocks: StocksToSave,
-      Subtotal: subtotal,
-      Tax,
-      Discount, // 🆕
-      PaymentMethod,
-      TotalAmount: totalAmount,
-    };
-
-    try {
-      await axios.post("https://billq-erp.onrender.com/createinvoice", billData);
-      setShowModal(false);
-      setShowSuccessModal(true);
-
-      // Reset form fields
-      setCustomerName("");
-      setCustomerNumber("");
-      setCustomerId(""); // ✅ Reset selected customer
-      setSelectedStocks([
-        { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, discount: 0, total: 0, search: "", showSuggestions: false },
-      ]);
-      setSubTotal(0);
-      setTax(0);
-      setDiscount(0);
-      setTotalAmount(0);
-      setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
-
-      handlePrint(billData);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to save billing.");
-    }
-
-  };
 
   const inputStyle = {
     border: "none",
