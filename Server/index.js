@@ -193,25 +193,37 @@ app.post("/createinvoice", async (req, res) => {
         quantityToDeduct: item.quantity
       });
 
+
       let productObjectId;
       try {
         productObjectId = typeof item.productId === 'string' ? new mongoose.Types.ObjectId(item.productId) : item.productId;
       } catch (e) {
-        console.log('❌ Invalid productId:', item.productId);
+        console.log('❌ Invalid productId:', item.productId, 'Type:', typeof item.productId);
         continue;
       }
+
+      console.log('🔍 Looking for stock:', {
+        requestProductId: item.productId,
+        requestProductIdType: typeof item.productId,
+        asObjectId: productObjectId,
+        asObjectIdType: typeof productObjectId
+      });
 
       const stock = await StockModel.findOne({
         productId: productObjectId
       });
 
       if (!stock) {
-        console.log('❌ No stock found for productId:', item.productId);
+        // List all stock productIds for debugging
+        const allStocks = await StockModel.find({}, {productId:1, name:1, quantity:1});
+        console.log('❌ No stock found for productId:', item.productId, 'ObjectId:', productObjectId);
+        console.log('All stock productIds:', allStocks.map(s => ({id: s.productId, name: s.name, quantity: s.quantity})));
         continue;
       }
 
       console.log('✅ Stock found:', {
         productId: stock.productId,
+        productIdType: typeof stock.productId,
         currentQuantity: stock.quantity
       });
 
