@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const cors = require("cors");
 const express = require("express");
 const Product = require("./Models/Products");
@@ -10,6 +9,7 @@ const Customers = require("./Models/Customers");
 const PurchaseInvoice = require("./Models/PurchaseInvoice");
 const StockModel = require("./Models/Stocks");
 const Credits = require("./Models/Credits");
+const mongoose = require("mongoose");
 
 
 
@@ -333,7 +333,7 @@ app.delete("/Customers/:id", async (req, res) => {
 
 // Purchasebill
 
-const mongoose = require("mongoose");
+
 
 app.post("/createpurchaseinvoice", async (req, res) => {
   try {
