@@ -16,7 +16,7 @@ const Credits = require("./Models/Credits");
 const app = express();
 
 app.use(cors({
-  origin: ["https://bill-q-erp.vercel.app", "http://localhost:5173"],
+  origin: "https://bill-q-erp.vercel.app", 
     credentials: true
 }));
 app.use(express.json());
@@ -124,6 +124,8 @@ app.delete("/suppliers/:id", async (req, res) => {
 });
 
 // Invoice
+const mongoose = require("mongoose");
+
 app.post("/createinvoice", async (req, res) => {
   try {
     const {
@@ -134,81 +136,58 @@ app.post("/createinvoice", async (req, res) => {
       Stocks,
       Subtotal,
       Tax,
+      Discount,
       PaymentMethod,
       TotalAmount,
-      Discount,
     } = req.body;
 
-    if (!InvoiceNumber) {
-      return res.status(400).json({ message: "InvoiceNumber missing" });
+    if (!InvoiceNumber || !Array.isArray(Stocks) || !Stocks.length) {
+      return res.status(400).json({ message: "Invalid invoice data" });
     }
 
-    if (!Array.isArray(Stocks) || Stocks.length === 0) {
-      return res.status(400).json({ message: "Stocks array invalid" });
-    }
-
-    // 1️⃣ Save invoice
-    const invoice = new Invoice({
-      InvoiceNumber,
-      date: date ? new Date(date) : new Date(),
-      CustomerName: CustomerName || "Walk-in",
-      CustomerNumber: CustomerNumber || "",
-      Stocks,
-      Subtotal: Number(Subtotal || 0),
-      Tax: Number(Tax || 0),
-      Discount: Number(Discount || 0),
-      PaymentMethod,
-      TotalAmount: Number(TotalAmount || 0),
-    });
-
-    await invoice.save();
-
-    // 2️⃣ Save credit invoice if needed
-    if (PaymentMethod === "Credit") {
-      await Credits.create({
-        _id: invoice._id,
-        InvoiceNumber,
-        date: invoice.date,
-        CustomerName,
-        CustomerNumber,
-        Stocks,
-        Subtotal,
-        Tax,
-        Discount,
-        PaymentMethod,
-        TotalAmount,
-      });
-    }
-
-    // 3️⃣ 🔥 DEDUCT STOCK (FIFO)
+    // 🔹 CHECK STOCK FIRST (NO PARTIAL SAVE)
     for (const item of Stocks) {
-      if (!item?.productId || !item?.quantity) continue;
+      const productId = new mongoose.Types.ObjectId(item.productId);
 
-      let remainingQty = Number(item.quantity);
-
-      // 🔍 Get all stock rows for product (FIFO)
-      const stockRows = await StockModel.find({
-        productId: item.productId,
-      }).sort({ cost: 1, createdAt: 1 });
-
-      if (!stockRows.length) {
-        return res.status(400).json({
-          message: `No stock found for ${item.name}`,
-        });
-      }
+      const stockRows = await StockModel.find({ productId });
 
       const totalAvailable = stockRows.reduce(
         (sum, s) => sum + s.quantity,
         0
       );
 
-      if (totalAvailable < remainingQty) {
-        return res.status(400).json({
-          message: `Insufficient stock for ${item.name}`,
-        });
+      if (totalAvailable < Number(item.quantity)) {
+        return res
+          .status(400)
+          .json({ message: `Insufficient stock for ${item.name}` });
       }
+    }
 
-      // 🔁 FIFO deduction
+    // 🔹 SAVE INVOICE
+    const invoice = new Invoice({
+      InvoiceNumber,
+      date: date ? new Date(date) : new Date(),
+      CustomerName: CustomerName || "Walk-in",
+      CustomerNumber: CustomerNumber || "",
+      Stocks,
+      Subtotal: Number(Subtotal),
+      Tax: Number(Tax),
+      Discount: Number(Discount),
+      PaymentMethod,
+      TotalAmount: Number(TotalAmount),
+    });
+
+    await invoice.save();
+
+    // 🔹 FIFO STOCK DEDUCTION
+    for (const item of Stocks) {
+      let remainingQty = Number(item.quantity);
+      const productId = new mongoose.Types.ObjectId(item.productId);
+
+      const stockRows = await StockModel.find({ productId }).sort({
+        createdAt: 1,
+      });
+
       for (const stock of stockRows) {
         if (remainingQty <= 0) break;
 
@@ -226,9 +205,7 @@ app.post("/createinvoice", async (req, res) => {
     res.status(200).json({ message: "Invoice created successfully" });
   } catch (error) {
     console.error("❌ SALES ERROR:", error);
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -347,6 +324,8 @@ app.delete("/Customers/:id", async (req, res) => {
 
 // Purchasebill
 
+const mongoose = require("mongoose");
+
 app.post("/createpurchaseinvoice", async (req, res) => {
   try {
     const {
@@ -361,13 +340,13 @@ app.post("/createpurchaseinvoice", async (req, res) => {
       TotalAmount,
     } = req.body;
 
-    if (!Array.isArray(Stocks) || Stocks.length === 0) {
-      return res.status(400).json({ message: "No products provided" });
+    if (!Array.isArray(Stocks) || !Stocks.length) {
+      return res.status(400).json({ message: "No stock items provided" });
     }
 
     const purchase = new PurchaseInvoice({
       InvoiceNumber,
-      date: new Date(date),
+      date: date ? new Date(date) : new Date(),
       SupplierName,
       Stocks,
       Subtotal,
@@ -383,10 +362,19 @@ app.post("/createpurchaseinvoice", async (req, res) => {
     for (const item of Stocks) {
       if (!item.productId || !item.quantity) continue;
 
+      const productId = new mongoose.Types.ObjectId(item.productId);
+
+      const cost = Number(item.Cost || item.cost);
+      const mrp = Number(item.MRP);
+
+      if (isNaN(cost) || isNaN(mrp)) {
+        throw new Error(`Cost/MRP missing for ${item.name}`);
+      }
+
       const existingStock = await StockModel.findOne({
-        productId: item.productId,
-        cost: item.Cost,
-        Brand: item.Brand || null,
+        productId,
+        cost,
+        Brand: item.Brand || "",
       });
 
       if (existingStock) {
@@ -394,11 +382,11 @@ app.post("/createpurchaseinvoice", async (req, res) => {
         await existingStock.save();
       } else {
         await StockModel.create({
-          productId: item.productId,
+          productId,
           name: item.name,
           quantity: Number(item.quantity),
-          cost: Number(item.Cost),
-          MRP: Number(item.MRP),
+          cost,
+          MRP: mrp,
           Unit: item.Unit,
           Barcode: item.Barcode,
           Brand: item.Brand || "",
