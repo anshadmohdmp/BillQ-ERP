@@ -193,8 +193,16 @@ app.post("/createinvoice", async (req, res) => {
         quantityToDeduct: item.quantity
       });
 
+      let productObjectId;
+      try {
+        productObjectId = typeof item.productId === 'string' ? new mongoose.Types.ObjectId(item.productId) : item.productId;
+      } catch (e) {
+        console.log('❌ Invalid productId:', item.productId);
+        continue;
+      }
+
       const stock = await StockModel.findOne({
-        productId: item.productId
+        productId: productObjectId
       });
 
       if (!stock) {
