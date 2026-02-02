@@ -124,7 +124,6 @@ app.delete("/suppliers/:id", async (req, res) => {
 });
 
 // Invoice
-const mongoose = require("mongoose");
 
 app.post("/createinvoice", async (req, res) => {
   try {
