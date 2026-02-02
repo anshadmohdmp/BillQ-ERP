@@ -148,8 +148,13 @@ app.post("/createinvoice", async (req, res) => {
     // 🔹 CHECK STOCK FIRST (NO PARTIAL SAVE)
     for (const item of Stocks) {
       const productId = new mongoose.Types.ObjectId(item.productId);
-
       const stockRows = await StockModel.find({ productId });
+
+      console.log('🔎 Checking stock for billing:', {
+        billingProductId: item.productId,
+        asObjectId: productId,
+        stockRows: stockRows.map(s => ({ _id: s._id, productId: s.productId, quantity: s.quantity, name: s.name }))
+      });
 
       const totalAvailable = stockRows.reduce(
         (sum, s) => sum + s.quantity,
@@ -157,6 +162,11 @@ app.post("/createinvoice", async (req, res) => {
       );
 
       if (totalAvailable < Number(item.quantity)) {
+        console.log('❌ Insufficient stock:', {
+          billingProductId: item.productId,
+          totalAvailable,
+          requested: item.quantity
+        });
         return res
           .status(400)
           .json({ message: `Insufficient stock for ${item.name}` });
