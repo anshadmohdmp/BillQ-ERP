@@ -236,32 +236,40 @@ const Billing = () => {
 
     // Check stock availability
     for (let p of validStocks) {
-      const stock = Stocks.find(s => s._id === p.productId);
-      if (!stock) {
-        alert(`Stock not found for ${p.name}`);
-        return;
-      }
-      if (p.quantity > stock.quantity) {
-        alert(`Insufficient stock for ${p.name}. Available: ${stock.quantity}`);
-        return;
-      }
-    }
+  const stock = Stocks.find(s => s.productId === p.productId);
+
+  if (!stock) {
+    alert(`Stock not found for ${p.name}`);
+    return;
+  }
+
+  if (p.quantity > stock.quantity) {
+    alert(
+      `Insufficient stock for ${p.name}. Available: ${stock.quantity}`
+    );
+    return;
+  }
+}
+
 
     // Prepare stocks to save
     const StocksToSave = validStocks.map(p => {
-      const stock = Stocks.find(s => s._id === p.productId);
-      return {
-        Barcode: p.barcode,
-        productId: stock?._id || p.productId,
-        name: p.name,
-        Brand: stock?.Brand || "",
-        quantity: Number(p.quantity),
-        Unit: p.unit,
-        price: Number(p.price),
-        cost: Number(p.cost),
-        profit: (Number(p.price) - Number(p.cost)) * Number(p.quantity)
-      };
-    });
+  const stock = Stocks.find(s => s.productId === p.productId);
+
+  return {
+    stockId: stock._id,        // 🔥 REQUIRED
+    productId: p.productId,
+    Barcode: p.barcode,
+    name: p.name,
+    Brand: stock?.Brand || "",
+    quantity: Number(p.quantity),
+    Unit: p.unit,
+    price: Number(p.price),
+    cost: Number(p.cost),
+    profit: (p.price - p.cost) * p.quantity
+  };
+});
+
 
     const billData = {
       InvoiceNumber,
