@@ -10,19 +10,20 @@ const PurchaseInvoice = require("./Models/PurchaseInvoice");
 const StockModel = require("./Models/Stocks");
 const Credits = require("./Models/Credits");
 const mongoose = require("mongoose");
+require('dotenv').config();
 
 
 
 const app = express();
 
 app.use(cors({
-  origin: "https://bill-q-erp.vercel.app", 
+  origin: process.env.CORS_URL, 
     credentials: true
 }));
 app.use(express.json());
 
 mongoose
-  .connect("mongodb+srv://anshadmuhammedmp:Mkmuhammedkunhi65@cluster0.zqs0dae.mongodb.net/MyBilling")
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("DB Connected"))
   .catch((err) => console.log("DB Connection Error: ", err));
 
