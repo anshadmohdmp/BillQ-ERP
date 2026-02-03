@@ -146,16 +146,9 @@ app.post("/createinvoice", async (req, res) => {
     }
 
     /* ======================================================
-       🔹 STEP 1: CHECK STOCK AVAILABILITY (NO DEDUCTION YET)
+       🔹 STEP 1: CHECK STOCK AVAILABILITY
     ====================================================== */
     for (const item of Stocks) {
-      if (!item.productId) {
-        return res
-          .status(400)
-          .json({ message: "Product ID missing in billing" });
-      }
-
-      // ⚠️ IMPORTANT: productId is STRING in DB
       const productId = String(item.productId);
 
       const stockRows = await StockModel.find({ productId });
@@ -165,12 +158,6 @@ app.post("/createinvoice", async (req, res) => {
         0
       );
 
-      console.log("🔎 Stock check:", {
-        productId,
-        available: totalAvailable,
-        requested: item.quantity,
-      });
-
       if (totalAvailable < Number(item.quantity)) {
         return res.status(400).json({
           message: `Insufficient stock for ${item.name}. Available: ${totalAvailable}`,
@@ -179,14 +166,45 @@ app.post("/createinvoice", async (req, res) => {
     }
 
     /* ======================================================
-       🔹 STEP 2: SAVE INVOICE
+       🔹 STEP 2: PREPARE STOCKS WITH COST
+    ====================================================== */
+    const invoiceStocks = [];
+
+    for (const item of Stocks) {
+      const productId = String(item.productId);
+
+      // 🔥 Get oldest stock row (FIFO) to fetch cost
+      const stockRow = await StockModel.findOne({ productId }).sort({
+        createdAt: 1,
+      });
+
+      if (!stockRow) {
+        return res
+          .status(400)
+          .json({ message: `Stock not found for ${item.name}` });
+      }
+
+      invoiceStocks.push({
+        Barcode: item.Barcode,
+        productId: item.productId,
+        name: item.name,
+        Brand: item.Brand,
+        quantity: Number(item.quantity),
+        Unit: item.Unit,
+        price: Number(item.price),
+        cost: Number(stockRow.cost), // ✅ REAL COST FROM STOCK
+      });
+    }
+
+    /* ======================================================
+       🔹 STEP 3: SAVE INVOICE
     ====================================================== */
     const invoice = new Invoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
       CustomerName: CustomerName || "Walk-in",
       CustomerNumber: CustomerNumber || "",
-      Stocks,
+      Stocks: invoiceStocks,
       Subtotal: Number(Subtotal),
       Tax: Number(Tax),
       Discount: Number(Discount),
@@ -197,14 +215,14 @@ app.post("/createinvoice", async (req, res) => {
     await invoice.save();
 
     /* ======================================================
-       🔹 STEP 3: FIFO STOCK DEDUCTION
+       🔹 STEP 4: FIFO STOCK DEDUCTION
     ====================================================== */
-    for (const item of Stocks) {
+    for (const item of invoiceStocks) {
       let remainingQty = Number(item.quantity);
       const productId = String(item.productId);
 
       const stockRows = await StockModel.find({ productId }).sort({
-        createdAt: 1, // FIFO
+        createdAt: 1,
       });
 
       for (const stock of stockRows) {
@@ -215,20 +233,19 @@ app.post("/createinvoice", async (req, res) => {
           await StockModel.deleteOne({ _id: stock._id });
         } else {
           stock.quantity -= remainingQty;
-          remainingQty = 0;
           await stock.save();
+          remainingQty = 0;
         }
       }
     }
 
-    res.status(200).json({
-      message: "Invoice created successfully",
-    });
+    res.status(200).json({ message: "Invoice created successfully" });
   } catch (error) {
     console.error("❌ SALES ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 

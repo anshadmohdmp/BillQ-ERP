@@ -1,29 +1,32 @@
 const mongoose = require("mongoose");
 
-const InvoiceSchema = new mongoose.Schema({
+const InvoiceSchema = new mongoose.Schema(
+  {
     InvoiceNumber: String,
     date: Date,
     CustomerName: String,
     CustomerNumber: String,
+
     Stocks: [
-        {   
-            Barcode: String,
-            productId: String,
-            name: String,
-            Brand: String,  
-            quantity: Number,
-            Unit: String,
-            price: Number,
-            Cost: Number,
-        },
+      {
+        Barcode: String,
+        productId: String,
+        name: String,
+        Brand: String,
+        quantity: Number,
+        Unit: String,
+        price: Number,
+        cost: Number, // ✅ LOWERCASE (FIXED)
+      },
     ],
-    Tax: Number,
+
     Subtotal: Number,
-    Discount: Number, 
+    Tax: Number,
+    Discount: Number,
     PaymentMethod: String,
-    TotalAmount: Number
-});
+    TotalAmount: Number,
+  },
+  { timestamps: true }
+);
 
-const Invoice = mongoose.model("Invoice", InvoiceSchema);
-
-module.exports = Invoice;
+module.exports = mongoose.model("Invoice", InvoiceSchema);
