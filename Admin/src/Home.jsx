@@ -31,26 +31,26 @@ const Home = () => {
     const map = {};
 
     invoices.forEach((inv) => {
-      const date = new Date(inv.date).toLocaleDateString("en-GB");
-      map[date] = map[date] || 0;
+  const date = new Date(inv.date).toLocaleDateString("en-GB");
+  map[date] = map[date] || 0;
 
-      inv.Products?.forEach((p) => {
-        const price = p.price || 0;
-        const cost = p.Cost || 0;
-        const qty = p.quantity || 0;
+  inv.Stocks?.forEach((p) => {
+    const price = Number(p.price) || 0;
+    const qty = Number(p.quantity) || 0;
+    const cost = Number(p.cost || 0); // if you don't store cost, keep it 0
 
-        sales += price * qty;
-        profit += (price - cost) * qty;
-        map[date] += price * qty;
-      });
-    });
+    sales += price * qty;
+    profit += (price - cost) * qty;
+    map[date] += price * qty;
+  });
+});
 
     setTotalSales(sales);
-    setTotalProfit(profit);
+setTotalProfit(profit);
 
-    setSalesData(
-      Object.keys(map).map((d) => ({ date: d, sales: map[d] }))
-    );
+setSalesData(
+  Object.keys(map).map((d) => ({ date: d, sales: map[d] }))
+);
   }, [invoices]);
 
   return (
