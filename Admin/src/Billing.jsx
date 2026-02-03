@@ -320,13 +320,8 @@ const Billing = () => {
       });
     }
   };
-
-
-  // 💾 Submit billing
- // 🔻 ONLY SHOWING THE UPDATED handleSubmit PART 🔻
-// (Rest of your component remains SAME)
-
 const handleSubmit = async () => {
+
   const validStocks = SelectedStocks.filter(
     (p) => p.productId && p.quantity > 0 && p.price > 0
   );
@@ -337,6 +332,7 @@ const handleSubmit = async () => {
     return;
   }
 
+  // ✅ Calculate totals
   const subtotal = validStocks.reduce(
     (acc, p) => acc + p.price * p.quantity,
     0
@@ -345,19 +341,27 @@ const handleSubmit = async () => {
   const totalAmount =
     subtotal + Number(Tax || 0) - Number(Discount || 0);
 
-  // ✅ FIXED PAYLOAD (NO COST FIELD)
+
+  // ⭐ FIXED PART
   const StocksToSave = validStocks.map((p) => {
-    const product = Stocks.find((prod) => prod._id === p.productId);
+
+    const stock = Stocks.find((s) => s._id === p.productId);
+
     return {
       Barcode: p.barcode,
-      productId: p.productId,
+
+      // ✅ SEND REAL PRODUCT ID (NOT STOCK ID)
+      productId: stock?.productId || p.productId,
+
       name: p.name,
-      Brand: product?.Brand || "",
+      Brand: stock?.Brand || "",
+
       quantity: Number(p.quantity),
       Unit: p.unit,
       price: Number(p.price),
     };
   });
+
 
   const billData = {
     InvoiceNumber,
@@ -381,10 +385,11 @@ const handleSubmit = async () => {
     setShowModal(false);
     setShowSuccessModal(true);
 
-    // Reset
+    // Reset form
     setCustomerName("");
     setCustomerNumber("");
     setCustomerId("");
+
     setSelectedStocks([
       {
         productId: "",
@@ -397,18 +402,22 @@ const handleSubmit = async () => {
         total: 0,
       },
     ]);
+
     setSubTotal(0);
     setTax(0);
     setDiscount(0);
     setTotalAmount(0);
+
     setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
 
     handlePrint(billData);
+
   } catch (error) {
     console.error("❌ BILLING ERROR:", error.response?.data || error);
     alert(error.response?.data?.message || "Failed to save billing");
   }
 };
+
 
 
   const inputStyle = {
@@ -444,7 +453,7 @@ const handleSubmit = async () => {
             textShadow: "0 0 6px rgba(255,255,255,0.1)",
           }}
         >
-          Billing
+          Billings
         </h2>
 
         <Form
