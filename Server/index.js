@@ -145,35 +145,42 @@ app.post("/createinvoice", async (req, res) => {
       return res.status(400).json({ message: "Invalid invoice data" });
     }
 
-    // 🔹 CHECK STOCK FIRST (NO PARTIAL SAVE)
+    /* ======================================================
+       🔹 STEP 1: CHECK STOCK AVAILABILITY (NO DEDUCTION YET)
+    ====================================================== */
     for (const item of Stocks) {
-      const productId = new mongoose.Types.ObjectId(item.productId);
+      if (!item.productId) {
+        return res
+          .status(400)
+          .json({ message: "Product ID missing in billing" });
+      }
+
+      // ⚠️ IMPORTANT: productId is STRING in DB
+      const productId = String(item.productId);
+
       const stockRows = await StockModel.find({ productId });
 
-      console.log('🔎 Checking stock for billing:', {
-        billingProductId: item.productId,
-        asObjectId: productId,
-        stockRows: stockRows.map(s => ({ _id: s._id, productId: s.productId, quantity: s.quantity, name: s.name }))
-      });
-
       const totalAvailable = stockRows.reduce(
-        (sum, s) => sum + s.quantity,
+        (sum, s) => sum + Number(s.quantity),
         0
       );
 
+      console.log("🔎 Stock check:", {
+        productId,
+        available: totalAvailable,
+        requested: item.quantity,
+      });
+
       if (totalAvailable < Number(item.quantity)) {
-        console.log('❌ Insufficient stock:', {
-          billingProductId: item.productId,
-          totalAvailable,
-          requested: item.quantity
+        return res.status(400).json({
+          message: `Insufficient stock for ${item.name}. Available: ${totalAvailable}`,
         });
-        return res
-          .status(400)
-          .json({ message: `Insufficient stock for ${item.name}` });
       }
     }
 
-    // 🔹 SAVE INVOICE
+    /* ======================================================
+       🔹 STEP 2: SAVE INVOICE
+    ====================================================== */
     const invoice = new Invoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
@@ -189,13 +196,15 @@ app.post("/createinvoice", async (req, res) => {
 
     await invoice.save();
 
-    // 🔹 FIFO STOCK DEDUCTION
+    /* ======================================================
+       🔹 STEP 3: FIFO STOCK DEDUCTION
+    ====================================================== */
     for (const item of Stocks) {
       let remainingQty = Number(item.quantity);
-      const productId = new mongoose.Types.ObjectId(item.productId);
+      const productId = String(item.productId);
 
       const stockRows = await StockModel.find({ productId }).sort({
-        createdAt: 1,
+        createdAt: 1, // FIFO
       });
 
       for (const stock of stockRows) {
@@ -212,12 +221,15 @@ app.post("/createinvoice", async (req, res) => {
       }
     }
 
-    res.status(200).json({ message: "Invoice created successfully" });
+    res.status(200).json({
+      message: "Invoice created successfully",
+    });
   } catch (error) {
     console.error("❌ SALES ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 

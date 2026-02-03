@@ -129,18 +129,20 @@ const Billing = () => {
 
     if (product) {
       updated[index] = {
-        ...updated[index],
-        productId: product._id,
-        barcode: cleanBarcode,
-        name: product.name,
-        unit: product.Unit || "",
-        price: product.MRP,
-        quantity: 1,
-        discount: 0,
-        total: product.MRP,
-        search: product.name,
-        showSuggestions: false,
-      };
+  ...updated[index],
+  productId: product.productId,
+  barcode: cleanBarcode,
+  name: product.name,
+  unit: product.Unit || "",
+  price: product.MRP,
+  cost: product.cost,
+  quantity: 1,
+  discount: 0,
+  total: product.MRP,
+  search: product.name,
+  showSuggestions: false,
+};
+
     } else {
       updated[index] = {
         ...updated[index],
@@ -162,18 +164,24 @@ const Billing = () => {
   const selectProduct = (index, product) => {
     const updated = [...SelectedStocks];
     updated[index] = {
-      ...updated[index],
-      selectedProduct: { value: product._id, label: product.name + " (" + product.Brand + ")" }, // ✅ this is for react-select
-      productId: product._id,
-      barcode: product.Barcode || "",
-      name: product.name,
-      price: product.MRP,
-      unit: product.Unit || "",
-      quantity: 1,
-      total: product.MRP,
-      search: product.name, // ✅ keep search in sync
-      showSuggestions: false,
-    };
+  ...updated[index],
+
+  // 🔥 THIS MUST MATCH STOCK.productId IN DB
+  productId: product.productId,
+
+  barcode: product.Barcode || "",
+  name: product.name,
+  unit: product.Unit || "",
+  price: product.MRP,
+
+  // 🔥 VERY IMPORTANT
+  cost: product.cost,
+
+  quantity: 1,
+  discount: 0,
+  total: product.MRP,
+};
+
     setSelectedStocks(updated);
   };
 
@@ -348,19 +356,25 @@ const handleSubmit = async () => {
     const stock = Stocks.find((s) => s._id === p.productId);
 
     return {
-      Barcode: p.barcode,
+  Barcode: p.barcode,
 
-      // ✅ SEND REAL PRODUCT ID (NOT STOCK ID)
-      productId: stock?.productId || p.productId,
+  // 🔥 THIS MUST MATCH STOCK.productId
+  productId: p.productId,
 
-      name: p.name,
-      Brand: stock?.Brand || "",
+  name: p.name,
+  Brand: stock?.Brand || "",
 
-      quantity: Number(p.quantity),
-      Unit: p.unit,
-      price: Number(p.price),
-      
-    };
+  quantity: Number(p.quantity),
+  Unit: p.unit,
+  price: Number(p.price),
+
+  // 🔥 ADD COST
+  cost: Number(p.cost),
+
+  // 🔥 PROFIT PER ITEM
+  profit: (Number(p.price) - Number(p.cost)) * Number(p.quantity),
+};
+
   });
 
 
