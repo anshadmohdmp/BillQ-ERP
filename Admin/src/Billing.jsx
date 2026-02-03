@@ -181,11 +181,12 @@ const Billing = () => {
 
 
   const handleQuantityChange = (index, value) => {
-    const updated = [...SelectedStocks];
-    updated[index].quantity = Number(value);
-    updated[index].total = (updated[index].quantity * updated[index].price) - updated[index].discount;
-    setSelectedStocks(updated);
-  };
+  const updated = [...SelectedStocks];
+  updated[index].quantity = Number(value);
+  updated[index].total = (updated[index].quantity * updated[index].price) - updated[index].discount;
+  updated[index].profit = ((updated[index].price - (updated[index].Cost || 0)) * updated[index].quantity) - updated[index].discount;
+  setSelectedStocks(updated);
+};
 
 
   const addRow = () => {
@@ -344,20 +345,19 @@ const handleSubmit = async () => {
 
   // ⭐ FIXED PART
   const StocksToSave = validStocks.map((p) => {
+  const stock = Stocks.find((s) => s._id === p.productId);
+  return {
+    Barcode: p.barcode,
+    productId: stock?._id || p.productId, // send stock id or real product id
+    name: p.name,
+    Brand: stock?.Brand || "",
+    quantity: Number(p.quantity),
+    Unit: p.unit,
+    price: Number(p.price),
+    Cost: Number(stock?.Cost || 0), // ✅ actual cost from DB
+  };
+});
 
-    const stock = Stocks.find((s) => s._id === p.productId);
-
-    return {
-      Barcode: p.barcode,
-      productId: stock?.productId || p.productId,
-      name: p.name,
-      Brand: stock?.Brand || "",
-      quantity: Number(p.quantity),
-      Unit: p.unit,
-      price: Number(p.price),
-      Cost: Number(stock?.Cost || 0),
-    };
-  });
 
 
   const billData = {
