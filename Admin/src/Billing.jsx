@@ -7,33 +7,32 @@ import "./Css/Billing.css";
 import Select from "react-select";
 import { Html5Qrcode } from "html5-qrcode";
 
-
-
 const Billing = () => {
   const [CustomerName, setCustomerName] = useState("");
   const [CustomerNumber, setCustomerNumber] = useState("");
   const [InvoiceNumber, setInvoiceNumber] = useState(`INV-${Math.floor(Math.random() * 100000)}`);
-  const [date, setdate] = useState(new Date().toISOString().substr(0, 10));
-
+  const [date, setDate] = useState(new Date().toISOString().substr(0, 10));
 
   const [SelectedStocks, setSelectedStocks] = useState([
-    { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, discount: 0, total: 0, search: "", showSuggestions: false },
+    { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, cost: 0, discount: 0, total: 0, profit: 0, search: "", showSuggestions: false },
   ]);
 
   const [PaymentMethod, setPaymentMethod] = useState("Cash");
   const [SubTotal, setSubTotal] = useState(0);
   const [Tax, setTax] = useState(0);
-  const [Discount, setDiscount] = useState(0); // 🆕 Added
+  const [Discount, setDiscount] = useState(0);
   const [TotalAmount, setTotalAmount] = useState(0);
+  const [Profit, setProfit] = useState(0);
+
   const [showModal, setShowModal] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const [FetchedCustomer, setFetchedCustomers] = useState([]);
   const [CustomerId, setCustomerId] = useState("");
-  const [Stocks, setStocks] = useState([])
+  const [Stocks, setStocks] = useState([]);
   const [showScanner, setShowScanner] = useState(false);
   const html5QrCodeRef = useRef(null);
-
   const wrapperRefs = useRef([]);
 
   // Fetch Stocks
@@ -43,31 +42,26 @@ const Billing = () => {
       .catch(err => console.error(err));
   }, []);
 
-
-
+  // Fetch Customers
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/Customers`)
       .then(res => setFetchedCustomers(res.data))
       .catch(err => console.error(err));
-  }, [])
+  }, []);
 
-
-
-
-
-
-  // Update subtotal and total (includes discount)
+  // Update totals & profit
   useEffect(() => {
     const sub = SelectedStocks.reduce((acc, item) => acc + item.total, 0);
-    setSubTotal(sub);
     const totalDiscount = SelectedStocks.reduce((acc, item) => acc + item.discount, 0);
-    setDiscount(totalDiscount); // main discount = sum of all row discounts
-    const total = sub + Number(Tax || 0); // no need to subtract main discount again
-    setTotalAmount(total >= 0 ? total : 0);
+    const profit = SelectedStocks.reduce((acc, item) => acc + ((item.price - item.cost) * item.quantity), 0);
+
+    setSubTotal(sub);
+    setDiscount(totalDiscount);
+    setProfit(profit);
+    setTotalAmount(sub + Number(Tax || 0) - totalDiscount);
   }, [SelectedStocks, Tax]);
 
-
-  // Close suggestion dropdowns on click outside
+  // Close suggestions on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       wrapperRefs.current.forEach((ref, index) => {
@@ -82,7 +76,7 @@ const Billing = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [SelectedStocks]);
 
-  const handleStocksearch = (index, value) => {
+  const handleStockSearch = (index, value) => {
     const updated = [...SelectedStocks];
     updated[index].search = value;
     updated[index].productId = "";
@@ -91,6 +85,7 @@ const Billing = () => {
     updated[index].total = 0;
     updated[index].unit = "";
     updated[index].barcode = "";
+    updated[index].cost = 0;
     updated[index].showSuggestions = true;
 
     const product = Stocks.find(p => p.name.toLowerCase() === value.toLowerCase());
@@ -102,8 +97,11 @@ const Billing = () => {
         name: product.name,
         unit: product.Unit || "",
         price: product.MRP,
+        cost: product.Cost || 0,
         quantity: 1,
+        discount: 0,
         total: product.MRP,
+        profit: product.MRP - (product.Cost || 0),
         showSuggestions: false,
       };
     }
@@ -117,14 +115,18 @@ const Billing = () => {
     setSelectedStocks(updated);
   };
 
+  const handleQuantityChange = (index, value) => {
+    const updated = [...SelectedStocks];
+    const qty = Number(value);
+    updated[index].quantity = qty;
+    updated[index].total = (qty * updated[index].price) - updated[index].discount;
+    updated[index].profit = (updated[index].price - updated[index].cost) * qty;
+    setSelectedStocks(updated);
+  };
 
   const handleBarcodeChange = (index, value) => {
     const cleanBarcode = value.trim();
-
-    const product = Stocks.find(
-      (p) => String(p.Barcode).trim() === cleanBarcode
-    );
-
+    const product = Stocks.find(p => String(p.Barcode).trim() === cleanBarcode);
     const updated = [...SelectedStocks];
 
     if (product) {
@@ -135,9 +137,11 @@ const Billing = () => {
         name: product.name,
         unit: product.Unit || "",
         price: product.MRP,
+        cost: product.Cost || 0,
         quantity: 1,
         discount: 0,
         total: product.MRP,
+        profit: product.MRP - (product.Cost || 0),
         search: product.name,
         showSuggestions: false,
       };
@@ -149,48 +153,39 @@ const Billing = () => {
         name: "",
         unit: "",
         price: 0,
+        cost: 0,
         quantity: 1,
         discount: 0,
         total: 0,
+        profit: 0,
       };
     }
-
     setSelectedStocks(updated);
   };
-
 
   const selectProduct = (index, product) => {
     const updated = [...SelectedStocks];
     updated[index] = {
       ...updated[index],
-      selectedProduct: { value: product._id, label: product.name + " (" + product.Brand + ")" }, // ✅ this is for react-select
+      selectedProduct: { value: product._id, label: `${product.name} (${product.Brand || "No Brand"})` },
       productId: product._id,
       barcode: product.Barcode || "",
       name: product.name,
       price: product.MRP,
+      cost: product.Cost || 0,
       unit: product.Unit || "",
       quantity: 1,
+      discount: 0,
       total: product.MRP,
-      search: product.name, // ✅ keep search in sync
+      profit: product.MRP - (product.Cost || 0),
+      search: product.name,
       showSuggestions: false,
     };
     setSelectedStocks(updated);
   };
 
-
-
-
-  const handleQuantityChange = (index, value) => {
-  const updated = [...SelectedStocks];
-  updated[index].quantity = Number(value);
-  updated[index].total = (updated[index].quantity * updated[index].price) - updated[index].discount;
-  updated[index].profit = ((updated[index].price - (updated[index].Cost || 0)) * updated[index].quantity) - updated[index].discount;
-  setSelectedStocks(updated);
-};
-
-
   const addRow = () => {
-    setSelectedStocks([...SelectedStocks, { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, total: 0, search: "", showSuggestions: false }]);
+    setSelectedStocks([...SelectedStocks, { productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, cost: 0, discount: 0, total: 0, profit: 0, search: "", showSuggestions: false }]);
   };
 
   const removeRow = (index) => {
@@ -199,116 +194,23 @@ const Billing = () => {
     setSelectedStocks(updated);
   };
 
-  // 🖨️ Print popup
-  const handlePrint = (billData) => {
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "absolute";
-    iframe.style.width = "0px";
-    iframe.style.height = "0px";
-    iframe.style.border = "0";
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`<html>
-        <head>
-          <title>Invoice - ${billData.InvoiceNumber}</title>
-          <style>
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          body { font-family: "Poppins", sans-serif; color: #333; margin: 0; padding: 20px; background: #f5f5f5; }
-          .invoice-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 800px; margin: auto; }
-          header { display: flex; justify-content: space-between; border-bottom: 2px solid #0c3e74; padding-bottom: 20px; }
-          header h1 { color: #0c3e74; margin: 0; }
-          .invoice-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-          .invoice-table th { background: #0c3e74; color: #fff; padding: 10px; text-align: left; }
-          .invoice-table td { border-bottom: 1px solid #ddd; padding: 10px; }
-          .summary { width: 300px; margin-top: 30px; margin-left: auto; }
-          .summary td { padding: 6px 0; }
-          .summary .total td { font-weight: bold; border-top: 2px solid #0c3e74; padding-top: 8px; }
-          footer { text-align: center; margin-top: 50px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 14px; color: #777; }
-          </style>
-        </head>
-        <body>
-          <div class="invoice-box">
-            <header>
-              <div>
-                <h1>Students Hub</h1>
-                <p>Opposite GHSS High School Gate,<br>Mathamangalam,Kannur,Kerala<br>Phone: +918921628952<br>Email: studentshub@gmail.com</p>
-              </div>
-              <div>
-                <h2>INVOICE</h2>
-                <p><strong>No:</strong> ${billData.InvoiceNumber}<br><strong>Date:</strong> ${billData.date}</p>
-              </div>
-            </header>
-            <section>
-              <h3>Bill To:</h3>
-              <p><strong>Customer Name: ${billData.CustomerName}</strong><br>Customer Phone: ${billData.CustomerNumber}</p>
-            </section>
-            <table class="invoice-table">
-              <thead>
-                <tr><th>#</th><th>Product</th><th>Qty</th><th>price</th><th>Total</th></tr>
-              </thead>
-              <tbody>
-                ${billData.Stocks.map((p, i) => `
-                  <tr>
-                    <td>${i + 1}</td>
-                    <td>${p.Brand} ${p.name}</td>
-                    <td>${p.quantity}</td>
-                    <td>${p.price.toFixed(2)}</td>
-                    <td>${(p.quantity * p.price).toFixed(2)}</td>
-                  </tr>
-                `).join("")}
-                
-              </tbody>
-            </table>
-            <section class="summary">
-              <table>
-                <tr><td>Subtotal:</td><td>${billData.Subtotal.toFixed(2)}</td></tr>
-                <tr><td>Discount:</td><td>-${billData.Discount.toFixed(2)}</td></tr>
-                <tr class="total"><td>Total:</td><td>${billData.TotalAmount.toFixed(2)}</td></tr>
-                <tr><td>Payment Method:</td><td>${billData.PaymentMethod}</td></tr>
-              </table>
-            </section>
-            <footer><p>Thank you for shopping with us!</p><p>Visit again</p></footer>
-          </div>
-        </body>
-      </html>`);
-
-    doc.close();
-
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-    }, 1000);
-  };
-
   const startScanner = (rowIndex) => {
     setShowScanner(true);
-
     setTimeout(() => {
       const scanner = new Html5Qrcode("barcode-scanner");
       html5QrCodeRef.current = scanner;
 
       scanner.start(
-        { facingMode: "environment" }, // back camera
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 100 },
-        },
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 100 } },
         (decodedText) => {
-          // ✅ BARCODE SCANNED
           handleBarcodeChange(rowIndex, decodedText);
-
           scanner.stop().then(() => {
             scanner.clear();
             setShowScanner(false);
           });
         },
-        (error) => {
-          // ignore scan errors
-        }
+        () => {}
       );
     }, 300);
   };
@@ -321,99 +223,84 @@ const Billing = () => {
       });
     }
   };
-const handleSubmit = async () => {
 
-  const validStocks = SelectedStocks.filter(
-    (p) => p.productId && p.quantity > 0 && p.price > 0
-  );
+  // Save Invoice
+  const handleSubmit = async () => {
+    const validStocks = SelectedStocks.filter(p => p.productId && p.quantity > 0 && p.price > 0);
 
-  if (!CustomerName.trim() || validStocks.length === 0) {
-    setShowModal(false);
-    setShowWarningModal(true);
-    return;
-  }
+    if (!CustomerName.trim() || validStocks.length === 0) {
+      setShowModal(false);
+      setShowWarningModal(true);
+      return;
+    }
 
-  // ✅ Calculate totals
-  const subtotal = validStocks.reduce(
-    (acc, p) => acc + p.price * p.quantity,
-    0
-  );
+    // Check stock availability
+    for (let p of validStocks) {
+      const stock = Stocks.find(s => s._id === p.productId);
+      if (!stock) {
+        alert(`Stock not found for ${p.name}`);
+        return;
+      }
+      if (p.quantity > stock.quantity) {
+        alert(`Insufficient stock for ${p.name}. Available: ${stock.quantity}`);
+        return;
+      }
+    }
 
-  const totalAmount =
-    subtotal + Number(Tax || 0) - Number(Discount || 0);
+    // Prepare stocks to save
+    const StocksToSave = validStocks.map(p => {
+      const stock = Stocks.find(s => s._id === p.productId);
+      return {
+        Barcode: p.barcode,
+        productId: stock?._id || p.productId,
+        name: p.name,
+        Brand: stock?.Brand || "",
+        quantity: Number(p.quantity),
+        Unit: p.unit,
+        price: Number(p.price),
+        cost: Number(p.cost),
+        profit: (Number(p.price) - Number(p.cost)) * Number(p.quantity)
+      };
+    });
 
+    const billData = {
+      InvoiceNumber,
+      date,
+      CustomerName,
+      CustomerNumber,
+      Stocks: StocksToSave,
+      Subtotal: SubTotal,
+      Tax,
+      Discount,
+      TotalAmount,
+      Profit,
+      PaymentMethod
+    };
 
-  // ⭐ FIXED PART
-  const StocksToSave = validStocks.map((p) => {
-  const stock = Stocks.find((s) => s._id === p.productId);
-  return {
-    Barcode: p.barcode,
-    productId: stock?._id || p.productId, // send stock id or real product id
-    name: p.name,
-    Brand: stock?.Brand || "",
-    quantity: Number(p.quantity),
-    Unit: p.unit,
-    price: Number(p.price),
-    Cost: Number(stock?.Cost || 0), // ✅ actual cost from DB
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/createinvoice`, billData);
+
+      setShowModal(false);
+      setShowSuccessModal(true);
+
+      // Reset form
+      setCustomerName("");
+      setCustomerNumber("");
+      setCustomerId("");
+      setSelectedStocks([{ productId: "", barcode: "", name: "", unit: "", quantity: 1, price: 0, cost: 0, discount: 0, total: 0, profit: 0 }]);
+      setSubTotal(0);
+      setTax(0);
+      setDiscount(0);
+      setTotalAmount(0);
+      setProfit(0);
+      setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
+
+      handlePrint(billData);
+    } catch (error) {
+      console.error("Billing Error:", error.response?.data || error);
+      alert(error.response?.data?.message || "Failed to save billing");
+    }
   };
-});
-
-
-
-  const billData = {
-  InvoiceNumber,
-  date,
-  CustomerName,
-  CustomerNumber,
-  Stocks: StocksToSave,
-  Subtotal: subtotal,
-  Tax,
-  Discount,
-  PaymentMethod,
-  TotalAmount: totalAmount,
-};
-
-  try {
-    await axios.post(
-      `${import.meta.env.VITE_API_URL}/createinvoice`,
-      billData
-    );
-
-    setShowModal(false);
-    setShowSuccessModal(true);
-
-    // Reset form
-    setCustomerName("");
-    setCustomerNumber("");
-    setCustomerId("");
-
-    setSelectedStocks([
-      {
-        productId: "",
-        barcode: "",
-        name: "",
-        unit: "",
-        quantity: 1,
-        price: 0,
-        discount: 0,
-        total: 0,
-      },
-    ]);
-
-    setSubTotal(0);
-    setTax(0);
-    setDiscount(0);
-    setTotalAmount(0);
-
-    setInvoiceNumber(`INV-${Math.floor(Math.random() * 100000)}`);
-
-    handlePrint(billData);
-
-  } catch (error) {
-    console.error("❌ BILLING ERROR:", error.response?.data || error);
-    alert(error.response?.data?.message || "Failed to save billing");
-  }
-};
 
 
 
