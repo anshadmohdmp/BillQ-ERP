@@ -14,7 +14,7 @@ const Editunit = () => {
 
   useEffect(() => {
     axios
-      .get(`https://billq-erp.onrender.com/units/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/units/${id}`)
       .then((response) => {
         setUnitName(response.data.UnitName);
       })
@@ -29,7 +29,7 @@ const Editunit = () => {
     }
     setError("");
     try {
-      await axios.put(`https://billq-erp.onrender.com/units/${id}`, { UnitName });
+      await axios.put(`${import.meta.env.VITE_API_URL}/units/${id}`, { UnitName });
       setShowSuccessModal(true); // show success modal
     } catch (error) {
       console.error("❌ There was an error!", error);

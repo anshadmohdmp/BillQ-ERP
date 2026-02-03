@@ -13,7 +13,7 @@ const Purchaseinvoices = () => {
 
 
   useEffect(() => {
-    axios.get("https://billq-erp.onrender.com/purchaseinvoices")
+    axios.get(`${import.meta.env.VITE_API_URL}/purchaseinvoices`)
       .then((response) => {
         setInvoices(response.data);
       })

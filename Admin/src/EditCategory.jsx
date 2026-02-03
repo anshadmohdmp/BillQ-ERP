@@ -14,7 +14,7 @@ const EditCategory = () => {
 
   useEffect(() => {
     axios
-      .get(`https://billq-erp.onrender.com/categories/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/categories/${id}`)
       .then((response) => setCategoryName(response.data.CategoryName))
       .catch((error) => console.error("Error fetching category data:", error));
   }, [id]);
@@ -30,7 +30,7 @@ const EditCategory = () => {
     setError("");
 
     try {
-      await axios.put(`https://billq-erp.onrender.com/categories/${id}`, { CategoryName });
+      await axios.put(`${import.meta.env.VITE_API_URL}/categories/${id}`, { CategoryName });
       setShowSuccessModal(true);
     } catch (error) {
       console.error("❌ There was an error!", error);

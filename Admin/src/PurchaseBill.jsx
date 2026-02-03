@@ -43,7 +43,7 @@ const PurchaseBill = () => {
 
   // Fetch products
   useEffect(() => {
-    axios.get("https://billq-erp.onrender.com/Products")
+    axios.get(`${import.meta.env.VITE_API_URL}/Products`)
       .then((res) => setProducts(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -54,7 +54,7 @@ const PurchaseBill = () => {
 
   // Fetch suppliers
   useEffect(() => {
-    axios.get("https://billq-erp.onrender.com/Suppliers")
+    axios.get(`${import.meta.env.VITE_API_URL}/Suppliers`)
       .then((res) => setFetchedSuppliers(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -324,7 +324,7 @@ const PurchaseBill = () => {
     };
 
     try {
-      await axios.post("https://billq-erp.onrender.com/createpurchaseinvoice", billData);
+      await axios.post(`${import.meta.env.VITE_API_URL}/createpurchaseinvoice`, billData);
       setShowSuccessModal(true);
 
       // Reset

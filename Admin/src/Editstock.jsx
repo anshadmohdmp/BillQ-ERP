@@ -28,7 +28,7 @@ const Editstock = () => {
   // Fetch product data
   useEffect(() => {
     axios
-      .get(`https://billq-erp.onrender.com/products/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/products/${id}`)
       .then((response) => {
         const data = response.data;
         setBarcode(data.Barcode);
@@ -47,9 +47,9 @@ const Editstock = () => {
 
   // Fetch categories, units, and suppliers
   useEffect(() => {
-    axios.get("https://billq-erp.onrender.com/categories").then((res) => setfetchedCategory(res.data));
-    axios.get("https://billq-erp.onrender.com/units").then((res) => setfetchedUnit(res.data));
-    axios.get("https://billq-erp.onrender.com/suppliers").then((res) => setfetchedsuppliers(res.data));
+    axios.get(`${import.meta.env.VITE_API_URL}/categories`).then((res) => setfetchedCategory(res.data));
+    axios.get(`${import.meta.env.VITE_API_URL}/units`).then((res) => setfetchedUnit(res.data));
+    axios.get(`${import.meta.env.VITE_API_URL}/suppliers`).then((res) => setfetchedsuppliers(res.data));
   }, []);
 
   const SubmitData = async (e) => {
@@ -63,7 +63,7 @@ const Editstock = () => {
     setError("");
 
     try {
-      await axios.put(`https://billq-erp.onrender.com/products/${id}`, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/products/${id}`, {
         Barcode,
         ProductName,
         Quantity,

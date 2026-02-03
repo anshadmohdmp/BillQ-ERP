@@ -12,7 +12,7 @@ const Stocks = () => {
   const fetchStocks = async () => {
     try {
       // Fetch all Stocks from Stocks collection
-      const response = await axios.get("https://billq-erp.onrender.com/stocks");
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/stocks`);
       setStocks(response.data);
     } catch (error) {
       console.error("Error fetching Stocks:", error);

@@ -13,7 +13,7 @@ const Credits = () => {
 
     const fetchCredits = async () => {
         try {
-            const response = await axios.get("https://billq-erp.onrender.com/credits");
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/credits`);
             setCredits(response.data);
         } catch (error) {
             console.error("Error fetching Credits:", error);
@@ -32,7 +32,7 @@ const Credits = () => {
 
         try {
             await axios.put(
-                `https://billq-erp.onrender.com/invoices/${invoiceId}/paymentMethod`,
+                `${import.meta.env.VITE_API_URL}/invoices/${invoiceId}/paymentMethod`,
                 { paymentMethod: selectedMethod }
             );
 

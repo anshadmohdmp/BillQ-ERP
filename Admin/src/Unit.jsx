@@ -23,7 +23,7 @@ const Unit = () => {
 
   const fetchUnits = async () => {
     try {
-      const response = await axios.get(`https://billq-erp.onrender.com/units`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/units`);
       setFetchedUnits(response.data);
     } catch (error) {
       console.error("Error fetching unit data:", error);
@@ -38,7 +38,7 @@ const Unit = () => {
     }
     setError("");
     try {
-      const response = await axios.post("https://billq-erp.onrender.com/createunit", { UnitName });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createunit`, { UnitName });
       setUnitName("");
       setFetchedUnits([...FetchedUnits, response.data]);
       setShowSuccessModal(true); // ✅ show success modal
@@ -77,7 +77,7 @@ const Unit = () => {
   const handleDelete = async () => {
     setShowDeleteConfirm(false);
     try {
-      await axios.delete(`https://billq-erp.onrender.com/units/${selectedUnitId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/units/${selectedUnitId}`);
       setFetchedUnits(FetchedUnits.filter((unit) => unit._id !== selectedUnitId));
     } catch (error) {
       console.error("❌ There was an error!", error);

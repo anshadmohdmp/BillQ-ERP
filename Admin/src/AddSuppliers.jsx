@@ -23,7 +23,7 @@ const AddSuppliers = () => {
     setError("");
 
     try {
-      const response = await axios.post("https://billq-erp.onrender.com/createsupplier", {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createsupplier`, {
         SupplierName,
         ContactPerson,
         ContactNumber,

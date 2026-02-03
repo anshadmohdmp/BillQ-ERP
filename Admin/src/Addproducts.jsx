@@ -25,7 +25,7 @@ const html5QrCodeRef = React.useRef(null);
   // ✅ Fetch Categories
   useEffect(() => {
     axios
-      .get("https://billq-erp.onrender.com/categories")
+      .get(`${import.meta.env.VITE_API_URL}/categories`)
       .then((response) => setFetchedCategory(response.data))
       .catch((error) => console.error("Error fetching categories:", error));
   }, []);
@@ -33,7 +33,7 @@ const html5QrCodeRef = React.useRef(null);
   // ✅ Fetch Units
   useEffect(() => {
     axios
-      .get("https://billq-erp.onrender.com/units")
+      .get(`${import.meta.env.VITE_API_URL}/units`)
       .then((response) => setFetchedUnit(response.data))
       .catch((error) => console.error("Error fetching units:", error));
   }, []);
@@ -60,7 +60,7 @@ const html5QrCodeRef = React.useRef(null);
     setError("");
 
     try {
-      await axios.post("https://billq-erp.onrender.com/createproduct", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/createproduct`, {
         Barcode,
         ProductName,
         Unit,

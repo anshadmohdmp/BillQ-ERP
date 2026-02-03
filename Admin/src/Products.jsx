@@ -20,7 +20,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("https://billq-erp.onrender.com/products");
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`);
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -46,7 +46,7 @@ const Products = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`https://billq-erp.onrender.com/products/${selectedProductId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/products/${selectedProductId}`);
       setProducts(Products.filter((p) => p._id !== selectedProductId));
       setShowDeleteConfirm(false);
     } catch (error) {

@@ -38,7 +38,7 @@ const Billing = () => {
 
   // Fetch Stocks
   useEffect(() => {
-    axios.get("https://billq-erp.onrender.com/stocks")
+    axios.get(`${import.meta.env.VITE_API_URL}/stocks`)
       .then(res => setStocks(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -46,7 +46,7 @@ const Billing = () => {
 
 
   useEffect(() => {
-    axios.get("https://billq-erp.onrender.com/Customers")
+    axios.get(`${import.meta.env.VITE_API_URL}/Customers`)
       .then(res => setFetchedCustomers(res.data))
       .catch(err => console.error(err));
   }, [])
@@ -378,7 +378,7 @@ const handleSubmit = async () => {
 
   try {
     await axios.post(
-      "https://billq-erp.onrender.com/createinvoice",
+      `${import.meta.env.VITE_API_URL}/createinvoice`,
       billData
     );
 

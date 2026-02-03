@@ -20,7 +20,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("https://billq-erp.onrender.com/invoices")
+      .get(`${import.meta.env.VITE_API_URL}/invoices`)
       .then((res) => setInvoices(res.data))
       .catch(console.error);
   }, []);

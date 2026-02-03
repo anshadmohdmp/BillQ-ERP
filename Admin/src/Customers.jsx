@@ -19,7 +19,7 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get("https://billq-erp.onrender.com/Customers");
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/Customers`);
       setCustomers(response.data);
     } catch (error) {
       console.error("Error fetching Customers:", error);
@@ -43,7 +43,7 @@ const Customers = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`https://billq-erp.onrender.com/Customers/${selectedCustomerId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/Customers/${selectedCustomerId}`);
       setCustomers(Customers.filter((s) => s._id !== selectedCustomerId));
       setShowDeleteConfirm(false);
     } catch (error) {
