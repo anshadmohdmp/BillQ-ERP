@@ -128,22 +128,22 @@ const Billing = () => {
     const updated = [...SelectedStocks];
 
     if (product) {
-      updated[index] = {
-  ...updated[index],
-  productId: product.productId,
-  barcode: cleanBarcode,
-  name: product.name,
-  unit: product.Unit || "",
-  price: product.MRP,
-  cost: product.cost,
-  quantity: 1,
-  discount: 0,
-  total: product.MRP,
-  search: product.name,
-  showSuggestions: false,
-};
-
-    } else {
+  updated[index] = {
+    ...updated[index],
+    productId: product.productId || product._id,
+    barcode: cleanBarcode,
+    name: product.name,
+    unit: product.Unit || "",
+    price: Number(product.MRP),
+    cost: Number(product.cost || 0), // 🔥 FIX
+    quantity: 1,
+    discount: 0,
+    total: Number(product.MRP),
+    search: product.name,
+    showSuggestions: false,
+  };
+}
+ else {
       updated[index] = {
         ...updated[index],
         barcode: cleanBarcode,
@@ -164,26 +164,20 @@ const Billing = () => {
   const selectProduct = (index, product) => {
     const updated = [...SelectedStocks];
     updated[index] = {
-  ...updated[index],
-
-  // 🔥 THIS MUST MATCH STOCK.productId IN DB
-  productId: product.productId,
-
-  barcode: product.Barcode || "",
-  name: product.name,
-  unit: product.Unit || "",
-  price: product.MRP,
-
-  // 🔥 VERY IMPORTANT
-  cost: product.cost,
-
-  quantity: 1,
-  discount: 0,
-  total: product.MRP,
-};
-
-    setSelectedStocks(updated);
+    ...updated[index],
+    productId: product.productId || product._id,
+    barcode: product.Barcode || "",
+    name: product.name,
+    unit: product.Unit || "",
+    price: Number(product.MRP),
+    cost: Number(product.cost || 0),   // 🔥 FIX
+    quantity: 1,
+    discount: 0,
+    total: Number(product.MRP),
   };
+
+  setSelectedStocks(updated);
+};
 
 
 
@@ -352,30 +346,24 @@ const handleSubmit = async () => {
 
   // ⭐ FIXED PART
   const StocksToSave = validStocks.map((p) => {
+  const stock = Stocks.find(
+    (s) => String(s.productId) === String(p.productId)
+  );
 
-    const stock = Stocks.find((s) => s._id === p.productId);
+  const cost = Number(stock?.cost || p.cost || 0);
 
-    return {
-  Barcode: p.barcode,
-
-  // 🔥 THIS MUST MATCH STOCK.productId
-  productId: p.productId,
-
-  name: p.name,
-  Brand: stock?.Brand || "",
-
-  quantity: Number(p.quantity),
-  Unit: p.unit,
-  price: Number(p.price),
-
-  // 🔥 ADD COST
-  cost: Number(p.cost),
-
-  // 🔥 PROFIT PER ITEM
-  profit: (Number(p.price) - Number(p.cost)) * Number(p.quantity),
-};
-
-  });
+  return {
+    Barcode: p.barcode,
+    productId: p.productId,
+    name: p.name,
+    Brand: stock?.Brand || "",
+    quantity: Number(p.quantity),
+    Unit: p.unit,
+    price: Number(p.price),
+    cost, // ✅ GUARANTEED COST
+    profit: (Number(p.price) - cost) * Number(p.quantity), // ✅ FIXED
+  };
+});
 
 
   const billData = {
