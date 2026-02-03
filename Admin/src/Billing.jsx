@@ -344,33 +344,38 @@ const handleSubmit = async () => {
 
   // ⭐ FIXED PART
   const StocksToSave = validStocks.map((p) => {
-  const stock = Stocks.find((s) => s._id === p.productId);
-  return {
-    Barcode: p.barcode,
-    productId: stock?._id || p.productId, // send stock id or real product id
-    name: p.name,
-    Brand: stock?.Brand || "",
-    quantity: Number(p.quantity),
-    Unit: p.unit,
-    price: Number(p.price),
-    Cost: Number(stock?.Cost || 0), // ✅ actual cost from DB
-  };
-});
 
+    const stock = Stocks.find((s) => s._id === p.productId);
+
+    return {
+      Barcode: p.barcode,
+
+      // ✅ SEND REAL PRODUCT ID (NOT STOCK ID)
+      productId: stock?.productId || p.productId,
+
+      name: p.name,
+      Brand: stock?.Brand || "",
+
+      quantity: Number(p.quantity),
+      Unit: p.unit,
+      price: Number(p.price),
+      
+    };
+  });
 
 
   const billData = {
-  InvoiceNumber,
-  date,
-  CustomerName,
-  CustomerNumber,
-  Stocks: StocksToSave,
-  Subtotal: subtotal,
-  Tax,
-  Discount,
-  PaymentMethod,
-  TotalAmount: totalAmount,
-};
+    InvoiceNumber,
+    date,
+    CustomerName,
+    CustomerNumber,
+    Stocks: StocksToSave,
+    Subtotal: subtotal,
+    Tax,
+    Discount,
+    PaymentMethod,
+    TotalAmount: totalAmount,
+  };
 
   try {
     await axios.post(
