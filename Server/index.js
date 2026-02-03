@@ -381,10 +381,10 @@ app.post("/createpurchaseinvoice", async (req, res) => {
       }
 
       const existingStock = await StockModel.findOne({
-        productId,
-        cost,
-        Brand: item.Brand || "",
-      });
+  productId,
+  cost
+});
+
 
       if (existingStock) {
         existingStock.quantity += Number(item.quantity);
@@ -398,7 +398,7 @@ app.post("/createpurchaseinvoice", async (req, res) => {
           MRP: mrp,
           Unit: item.Unit,
           Barcode: item.Barcode,
-          Brand: item.Brand || "",
+          Brand: item.Brand || null,
         });
       }
     }
