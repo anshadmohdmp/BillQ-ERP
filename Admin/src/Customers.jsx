@@ -4,6 +4,7 @@ import { Table, Card, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import "../src/Css/Customers.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Customers = () => {
   const [Customers, setCustomers] = useState([]);
@@ -12,6 +13,7 @@ const Customers = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     fetchCustomers();
@@ -19,7 +21,11 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/Customers`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/Customers`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setCustomers(response.data);
     } catch (error) {
       console.error("Error fetching Customers:", error);
@@ -43,7 +49,11 @@ const Customers = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/Customers/${selectedCustomerId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/Customers/${selectedCustomerId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setCustomers(Customers.filter((s) => s._id !== selectedCustomerId));
       setShowDeleteConfirm(false);
     } catch (error) {

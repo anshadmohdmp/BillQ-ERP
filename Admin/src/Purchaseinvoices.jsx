@@ -4,16 +4,23 @@ import { useEffect } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
 import { MdPrint } from "react-icons/md";
 import "./Css/Purchaseinvoices.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Purchaseinvoices = () => {
   const [Invoices, setInvoices] = useState([]);
 
   console.log(Invoices);
+
+  const { user } = useAuth(); 
   
 
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/purchaseinvoices`)
+    axios.get(`${import.meta.env.VITE_API_URL}/purchaseinvoices`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => {
         setInvoices(response.data);
       })

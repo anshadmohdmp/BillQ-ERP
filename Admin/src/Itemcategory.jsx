@@ -3,6 +3,7 @@ import { Button, Form, Card, Table, Modal } from "react-bootstrap";
 import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./context/AuthProvider";
 
 const Itemcategory = () => {
   const [Itemcategory, setItemcategory] = useState("");
@@ -15,6 +16,7 @@ const Itemcategory = () => {
   const [selectedItemcategoryId, setSelectedItemcategoryId] = useState(null);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     fetchItemcategorys();
@@ -22,7 +24,11 @@ const Itemcategory = () => {
 
   const fetchItemcategorys = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/itemcategorys`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/itemcategorys`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setFetchedItemcategorys(response.data);
     } catch (error) {
       console.error("Error fetching Itemcategory data:", error);
@@ -37,7 +43,11 @@ const Itemcategory = () => {
     }
     setError("");
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createitemcategory`, { Itemcategory });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createitemcategory`, { Itemcategory },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setItemcategory("");
       setFetchedItemcategorys([...FetchedItemcategorys, response.data]);
       setShowSuccessModal(true); // ✅ show success modal
@@ -76,7 +86,11 @@ const Itemcategory = () => {
   const handleDelete = async () => {
     setShowDeleteConfirm(false);
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/itemcategorys/${selectedItemcategoryId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/itemcategorys/${selectedItemcategoryId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setFetchedItemcategorys(FetchedItemcategorys.filter((Itemcategory) => Itemcategory._id !== selectedItemcategoryId));
     } catch (error) {
       console.error("❌ There was an error!", error);

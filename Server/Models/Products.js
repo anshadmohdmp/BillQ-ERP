@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Unit = require("./Unit");
 
 const productSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     Barcode: String,
     ProductName: String,
     Unit: String,

@@ -3,6 +3,7 @@ import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "../src/Css/Suppliers.css";
+import { useAuth } from "./context/AuthProvider";
 
 const EditItemcategory = () => {
   const [Itemcategory, setItemcategory] = useState("");
@@ -11,10 +12,15 @@ const EditItemcategory = () => {
 
   const Navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/itemcategorys/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/itemcategorys/${id}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => {
         setItemcategory(response.data.Itemcategory);
       })
@@ -29,7 +35,11 @@ const EditItemcategory = () => {
     }
     setError("");
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/Itemcategorys/${id}`, { Itemcategory });
+      await axios.put(`${import.meta.env.VITE_API_URL}/Itemcategorys/${id}`, { Itemcategory },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setShowSuccessModal(true); // show success modal
     } catch (error) {
       console.error("❌ There was an error!", error);

@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Table, Card, Button } from "react-bootstrap";
 import "./Css/Credits.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Credits = () => {
     const [Credits, setCredits] = useState([]);
@@ -13,7 +14,11 @@ const Credits = () => {
 
     const fetchCredits = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/credits`);
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/credits`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
             setCredits(response.data);
         } catch (error) {
             console.error("Error fetching Credits:", error);
@@ -27,6 +32,8 @@ const Credits = () => {
         }));
     };
 
+    const { user } = useAuth(); 
+
     const handlePayment = async (invoiceId) => {
         const selectedMethod = paymentMethodSelection[invoiceId] || "Credit";
 
@@ -34,7 +41,11 @@ const Credits = () => {
             await axios.put(
                 `${import.meta.env.VITE_API_URL}/invoices/${invoiceId}/paymentMethod`,
                 { paymentMethod: selectedMethod }
-            );
+            ,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
 
             // Update local state
             setCredits((prev) =>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import "./Css/Home.css";
+import { useAuth } from "./context/AuthProvider";
 import {
   BarChart,
   Bar,
@@ -18,10 +19,16 @@ const Home = () => {
   const [totalSales, setTotalSales] = useState(0);
   const [totalProfit, setTotalProfit] = useState(0);
 
+  const { user } = useAuth(); 
+
   // Fetch all invoices
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/invoices`)
+      .get(`${import.meta.env.VITE_API_URL}/invoices`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((res) => setInvoices(res.data))
       .catch((err) => console.error("Error fetching invoices:", err));
   }, []);

@@ -4,6 +4,7 @@ import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import "./Css/Brand.css"
+import { useAuth } from "./context/AuthProvider";
 
 
 const Brand = () => {
@@ -17,6 +18,7 @@ const Brand = () => {
   const [selectedBrandId, setSelectedBrandId] = useState(null);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     fetchBrands();
@@ -24,7 +26,11 @@ const Brand = () => {
 
   const fetchBrands = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/brands`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/brands`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setFetchedBrands(response.data);
     } catch (error) {
       console.error("Error fetching Brand data:", error);
@@ -39,7 +45,11 @@ const Brand = () => {
     }
     setError("");
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createbrand`, { Brand });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createbrand`, { Brand },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setBrand("");
       setFetchedBrands([...FetchedBrands, response.data]);
       setShowSuccessModal(true); // ✅ show success modal
@@ -78,7 +88,11 @@ const Brand = () => {
   const handleDelete = async () => {
     setShowDeleteConfirm(false);
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/brands/${selectedBrandId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/brands/${selectedBrandId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setFetchedBrands(FetchedBrands.filter((Brand) => Brand._id !== selectedBrandId));
     } catch (error) {
       console.error("❌ There was an error!", error);

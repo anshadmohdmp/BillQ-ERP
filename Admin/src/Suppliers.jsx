@@ -4,6 +4,7 @@ import { Table, Card, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import "../src/Css/Suppliers.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Suppliers = () => {
   const [Suppliers, setSuppliers] = useState([]);
@@ -12,6 +13,7 @@ const Suppliers = () => {
   const [selectedSupplierId, setSelectedSupplierId] = useState(null);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     fetchSuppliers();
@@ -19,7 +21,11 @@ const Suppliers = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/suppliers`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/suppliers`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setSuppliers(response.data);
     } catch (error) {
       console.error("Error fetching Suppliers:", error);
@@ -43,7 +49,11 @@ const Suppliers = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/suppliers/${selectedSupplierId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/suppliers/${selectedSupplierId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setSuppliers(Suppliers.filter((s) => s._id !== selectedSupplierId));
       setShowDeleteConfirm(false);
     } catch (error) {

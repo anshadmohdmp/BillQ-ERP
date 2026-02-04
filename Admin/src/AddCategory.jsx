@@ -4,6 +4,7 @@ import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddCategory.css";
+import { useAuth } from "./context/AuthProvider";
 
 
 const AddCategory = () => {
@@ -22,13 +23,20 @@ const AddCategory = () => {
 
   const navigate = useNavigate();
 
+  const { user } = useAuth(); // user contains the token
+
+
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/categories`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/categories`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setFetchedCategoryName(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -46,7 +54,11 @@ const AddCategory = () => {
     setError("");
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/createcategory`, { CategoryName });
+      await axios.post(`${import.meta.env.VITE_API_URL}/createcategory`, { CategoryName },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setShowAddModal(true);
       setCategoryName("");
       fetchCategories();
@@ -63,7 +75,11 @@ const AddCategory = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/categories/${deleteId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/categories/${deleteId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setShowDeleteConfirm(false);
       setShowDeleteSuccess(true);
       fetchCategories();

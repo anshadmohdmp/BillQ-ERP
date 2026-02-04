@@ -2,17 +2,23 @@ import React, { useState, useEffect } from "react";
 import { Card, Table } from "react-bootstrap";
 import axios from "axios";
 import "./Css/Stocks.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Stocks = () => {
   const [Stocks, setStocks] = useState([]);
 
   console.log(Stocks);
+  const { user } = useAuth(); 
   
 
   const fetchStocks = async () => {
     try {
       // Fetch all Stocks from Stocks collection
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/stocks`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/stocks`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setStocks(response.data);
     } catch (error) {
       console.error("Error fetching Stocks:", error);

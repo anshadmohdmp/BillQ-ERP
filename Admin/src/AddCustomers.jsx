@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./context/AuthProvider";
 
 const AddCustomers = () => {
   const [CustomerName, setCustomerName] = useState("");
@@ -11,6 +12,7 @@ const AddCustomers = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   const SubmitData = async (e) => {
     e.preventDefault();
@@ -27,7 +29,11 @@ const AddCustomers = () => {
         CustomerName,
         CustomerAddress,
         CustomerNumber,
-      });
+      },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
 
       console.log("Customer added successfully:", response.data);
 

@@ -30,15 +30,17 @@ import Login from "./Login";
 import Register from "./Register";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import { useAuth } from "./context/AuthProvider"; 
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
+  const { user } = useAuth(); // ✅ use context
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
   return children;
 };
+
 
 // App Content with Sidebar logic
 const AppContent = () => {

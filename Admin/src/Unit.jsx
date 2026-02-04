@@ -4,6 +4,7 @@ import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import "../src/Css/Units.css"
+import { useAuth } from "./context/AuthProvider";
 
 const Unit = () => {
   const [UnitName, setUnitName] = useState("");
@@ -16,6 +17,7 @@ const Unit = () => {
   const [selectedUnitId, setSelectedUnitId] = useState(null);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     fetchUnits();
@@ -23,7 +25,11 @@ const Unit = () => {
 
   const fetchUnits = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/units`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/units`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setFetchedUnits(response.data);
     } catch (error) {
       console.error("Error fetching unit data:", error);
@@ -38,7 +44,11 @@ const Unit = () => {
     }
     setError("");
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createunit`, { UnitName });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createunit`, { UnitName },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setUnitName("");
       setFetchedUnits([...FetchedUnits, response.data]);
       setShowSuccessModal(true); // ✅ show success modal
@@ -77,7 +87,11 @@ const Unit = () => {
   const handleDelete = async () => {
     setShowDeleteConfirm(false);
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/units/${selectedUnitId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/units/${selectedUnitId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setFetchedUnits(FetchedUnits.filter((unit) => unit._id !== selectedUnitId));
     } catch (error) {
       console.error("❌ There was an error!", error);

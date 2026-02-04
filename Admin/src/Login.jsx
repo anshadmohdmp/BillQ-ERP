@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, Form, Button } from "react-bootstrap";
+import { useAuth } from "./context/AuthProvider";
+
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -9,30 +11,18 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const { login } = useAuth();
+
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
+    username,
+    password,
+  });
 
-    if (!username || !password) {
-      setError("Please fill all fields");
-      return;
-    }
-
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
-        username,
-        password,
-      });
-
-      // Save JWT token to localStorage
-      localStorage.setItem("token", res.data.token);
-
-      // Redirect to dashboard
-      navigate("/home");
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-    }
-  };
+  login(res.data.token, username); // ✅ store in context
+  navigate("/home");
+};
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">

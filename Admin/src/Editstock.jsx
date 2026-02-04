@@ -3,6 +3,7 @@ import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "./Css/AddProducts.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Editstock = () => {
   const [Barcode, setBarcode] = useState("");
@@ -24,6 +25,7 @@ const Editstock = () => {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   // Fetch product data
   useEffect(() => {
@@ -47,9 +49,21 @@ const Editstock = () => {
 
   // Fetch categories, units, and suppliers
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/categories`).then((res) => setfetchedCategory(res.data));
-    axios.get(`${import.meta.env.VITE_API_URL}/units`).then((res) => setfetchedUnit(res.data));
-    axios.get(`${import.meta.env.VITE_API_URL}/suppliers`).then((res) => setfetchedsuppliers(res.data));
+    axios.get(`${import.meta.env.VITE_API_URL}/categories`).then((res) => setfetchedCategory(res.data),{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
+    axios.get(`${import.meta.env.VITE_API_URL}/units`).then((res) => setfetchedUnit(res.data),{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
+    axios.get(`${import.meta.env.VITE_API_URL}/suppliers`).then((res) => setfetchedsuppliers(res.data),{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
   }, []);
 
   const SubmitData = async (e) => {
@@ -74,7 +88,11 @@ const Editstock = () => {
         ItemCategory,
         Brand,
         Supplier,
-      });
+      },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
 
       // Show success modal instead of alert
       setShowSuccessModal(true);

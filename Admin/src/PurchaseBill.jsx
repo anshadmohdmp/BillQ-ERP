@@ -6,6 +6,7 @@ import Select from "react-select";
 import { v4 as uuidv4 } from 'uuid';
 import "./Css/Purchasebilling.css";
 import { Html5Qrcode } from "html5-qrcode";
+import { useAuth } from "./context/AuthProvider";
 
 const PurchaseBill = () => {
   const [SupplierName, setSupplierName] = useState("");
@@ -32,6 +33,8 @@ const PurchaseBill = () => {
   const [scanRowIndex, setScanRowIndex] = useState(null);
   const html5QrCodeRef = React.useRef(null);
 
+  const { user } = useAuth(); 
+
   const inputStyle = {
     backgroundColor: "#3a3a3a",
     border: "none",
@@ -43,7 +46,11 @@ const PurchaseBill = () => {
 
   // Fetch products
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/Products`)
+    axios.get(`${import.meta.env.VITE_API_URL}/Products`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((res) => setProducts(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -54,7 +61,11 @@ const PurchaseBill = () => {
 
   // Fetch suppliers
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/Suppliers`)
+    axios.get(`${import.meta.env.VITE_API_URL}/Suppliers`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((res) => setFetchedSuppliers(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -324,7 +335,11 @@ const PurchaseBill = () => {
     };
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/createpurchaseinvoice`, billData);
+      await axios.post(`${import.meta.env.VITE_API_URL}/createpurchaseinvoice`, billData,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setShowSuccessModal(true);
 
       // Reset

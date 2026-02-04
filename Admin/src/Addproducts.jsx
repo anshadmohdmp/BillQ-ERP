@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddProducts.css";
 import { Html5Qrcode } from "html5-qrcode";
+import { useAuth } from "./context/AuthProvider";
 
 
 const Addproducts = () => {
@@ -23,11 +24,16 @@ const Addproducts = () => {
 const html5QrCodeRef = React.useRef(null);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   // ✅ Fetch Categories
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/categories`)
+      .get(`${import.meta.env.VITE_API_URL}/categories`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => setFetchedCategory(response.data))
       .catch((error) => console.error("Error fetching categories:", error));
   }, []);
@@ -35,21 +41,33 @@ const html5QrCodeRef = React.useRef(null);
   // ✅ Fetch Units
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/units`)
+      .get(`${import.meta.env.VITE_API_URL}/units`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => setFetchedUnit(response.data))
       .catch((error) => console.error("Error fetching units:", error));
   }, []);
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/brands`)
+      .get(`${import.meta.env.VITE_API_URL}/brands`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => setFetchedBrand(response.data))
       .catch((error) => console.error("Error fetching brands:", error));
   }, []);
 
    useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/itemcategorys`)
+      .get(`${import.meta.env.VITE_API_URL}/itemcategorys`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => setFetchedItemcategory(response.data))
       .catch((error) => console.error("Error fetching brands:", error));
   }, []);
@@ -85,7 +103,11 @@ const html5QrCodeRef = React.useRef(null);
         Category,
         ItemCategory,
         Brand,
-      });
+      },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
 
       // ✅ Show modal instead of alert
       setShowSuccessModal(true);

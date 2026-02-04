@@ -6,6 +6,7 @@ import "./Css/AddProducts.css";
 import "./Css/Billing.css";
 import Select from "react-select";
 import { Html5Qrcode } from "html5-qrcode";
+import { useAuth } from "./context/AuthProvider";
 
 
 
@@ -35,10 +36,15 @@ const Billing = () => {
   const html5QrCodeRef = useRef(null);
 
   const wrapperRefs = useRef([]);
+  const { user } = useAuth(); 
 
   // Fetch Stocks
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/stocks`)
+    axios.get(`${import.meta.env.VITE_API_URL}/stocks`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then(res => setStocks(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -46,7 +52,11 @@ const Billing = () => {
 
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/Customers`)
+    axios.get(`${import.meta.env.VITE_API_URL}/Customers`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then(res => setFetchedCustomers(res.data))
       .catch(err => console.error(err));
   }, [])
@@ -394,7 +404,11 @@ const handleSubmit = async () => {
     await axios.post(
       `${import.meta.env.VITE_API_URL}/createinvoice`,
       billData
-    );
+    ,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
 
     setShowModal(false);
     setShowSuccessModal(true);

@@ -3,6 +3,7 @@ import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "../src/Css/Suppliers.css";
+import { useAuth } from "./context/AuthProvider";
 
 const EditCustomers = () => {
   const [CustomerName, setCustomerName] = useState("");
@@ -13,11 +14,16 @@ const EditCustomers = () => {
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth(); 
 
   // Fetch Customer data
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/Customers/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/Customers/${id}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => {
         const Customer = response.data;
         setCustomerName(Customer.CustomerName);
@@ -42,7 +48,11 @@ const EditCustomers = () => {
         CustomerName,
         CustomerAddress,
         CustomerNumber,
-      });
+      },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
 
       // Show success modal instead of alert
       setShowSuccessModal(true);

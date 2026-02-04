@@ -85,107 +85,207 @@ app.post("/login", async (req, res) => {
   }
 });
 
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Access denied" });
+
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    res.status(403).json({ message: "Invalid token" });
+  }
+};
+
 
 // Add Products
 
-app.post("/createproduct", async (req, res) => {
-  Product.create(req.body)
-    .then((product) => res.json(product))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Create Product - attach userId
+app.post("/createproduct", verifyToken, async (req, res) => {
+  try {
+    const productData = { ...req.body, userId: req.user.id }; // attach userId
+    const product = await Product.create(productData);
+    res.json(product);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/products", async (req, res) => {
-  Product.find()
-    .then((products) => res.json(products))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all products for this user
+app.get("/products", verifyToken, async (req, res) => {
+  try {
+    const products = await Product.find({ userId: req.user.id });
+    res.json(products);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/products/:id", async (req, res) => {
-  Product.findById(req.params.id)
-    .then((product) => res.json(product))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get product by ID (only if belongs to this user)
+app.get("/products/:id", verifyToken, async (req, res) => {
+  try {
+    const product = await Product.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/products/:id", async (req, res) => {
-  Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((product) => res.json(product))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Update product (only if belongs to this user)
+app.put("/products/:id", verifyToken, async (req, res) => {
+  try {
+    const product = await Product.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.delete("/products/:id", async (req, res) => {
-  Product.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Product deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Delete product (only if belongs to this user)
+app.delete("/products/:id", verifyToken, async (req, res) => {
+  try {
+    const product = await Product.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json({ message: "Product deleted." });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 // Add Category
 
-app.post("/createcategory", async (req, res) => {
-  Category.create(req.body)
-    .then((category) => res.json(category))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Create Category - attach userId
+app.post("/createcategory", verifyToken, async (req, res) => {
+  try {
+    const categoryData = { ...req.body, userId: req.user.id }; // attach userId
+    const category = await Category.create(categoryData);
+    res.json(category);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/categories", async (req, res) => {
-  Category.find()
-    .then((categories) => res.json(categories))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all categories for this user
+app.get("/categories", verifyToken, async (req, res) => {
+  try {
+    const categories = await Category.find({ userId: req.user.id });
+    res.json(categories);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/categories/:id", async (req, res) => {
-  Category.findById(req.params.id)
-    .then((category) => res.json(category))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get category by ID (only if belongs to this user)
+app.get("/categories/:id", verifyToken, async (req, res) => {
+  try {
+    const category = await Category.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!category) return res.status(404).json({ message: "Category not found" });
+    res.json(category);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/categories/:id", async (req, res) => {
-  Category.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((category) => res.json(category))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Update category (only if belongs to this user)
+app.put("/categories/:id", verifyToken, async (req, res) => {
+  try {
+    const category = await Category.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!category) return res.status(404).json({ message: "Category not found" });
+    res.json(category);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.delete("/categories/:id", async (req, res) => {
-  Category.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Category deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Delete category (only if belongs to this user)
+app.delete("/categories/:id", verifyToken, async (req, res) => {
+  try {
+    const category = await Category.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!category) return res.status(404).json({ message: "Category not found" });
+    res.json({ message: "Category deleted." });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 
 // Add Suppliers 
 
-app.post("/createsupplier", async (req, res) => {
-  Suppliers.create(req.body)
-    .then((supplier) => res.json(supplier))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Create Supplier - attach userId
+app.post("/createsupplier", verifyToken, async (req, res) => {
+  try {
+    const supplierData = { ...req.body, userId: req.user.id }; // attach userId
+    const supplier = await Suppliers.create(supplierData);
+    res.json(supplier);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/suppliers", async (req, res) => {
-  Suppliers.find()
-    .then((suppliers) => res.json(suppliers))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all suppliers for this user
+app.get("/suppliers", verifyToken, async (req, res) => {
+  try {
+    const suppliers = await Suppliers.find({ userId: req.user.id });
+    res.json(suppliers);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/suppliers/:id", async (req, res) => {
-  Suppliers.findById(req.params.id)
-    .then((supplier) => res.json(supplier))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get supplier by ID (only if belongs to this user)
+app.get("/suppliers/:id", verifyToken, async (req, res) => {
+  try {
+    const supplier = await Suppliers.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!supplier) return res.status(404).json({ message: "Supplier not found" });
+    res.json(supplier);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/suppliers/:id", async (req, res) => {
-  Suppliers.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((supplier) => res.json(supplier))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Update supplier (only if belongs to this user)
+app.put("/suppliers/:id", verifyToken, async (req, res) => {
+  try {
+    const supplier = await Suppliers.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!supplier) return res.status(404).json({ message: "Supplier not found" });
+    res.json(supplier);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.delete("/suppliers/:id", async (req, res) => {
-  Suppliers.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Supplier deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Delete supplier (only if belongs to this user)
+app.delete("/suppliers/:id", verifyToken, async (req, res) => {
+  try {
+    const supplier = await Suppliers.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!supplier) return res.status(404).json({ message: "Supplier not found" });
+    res.json({ message: "Supplier deleted." });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 // Invoice
 
-app.post("/createinvoice", async (req, res) => {
+// Create Invoice - attach userId
+app.post("/createinvoice", verifyToken, async (req, res) => {
   try {
     const {
       InvoiceNumber,
@@ -204,18 +304,11 @@ app.post("/createinvoice", async (req, res) => {
       return res.status(400).json({ message: "Invalid invoice data" });
     }
 
-    /* ======================================================
-       🔹 STEP 1: CHECK STOCK AVAILABILITY
-    ====================================================== */
+    // STEP 1: Check stock availability
     for (const item of Stocks) {
       const productId = String(item.productId);
-
       const stockRows = await StockModel.find({ productId });
-
-      const totalAvailable = stockRows.reduce(
-        (sum, s) => sum + Number(s.quantity),
-        0
-      );
+      const totalAvailable = stockRows.reduce((sum, s) => sum + Number(s.quantity), 0);
 
       if (totalAvailable < Number(item.quantity)) {
         return res.status(400).json({
@@ -224,23 +317,13 @@ app.post("/createinvoice", async (req, res) => {
       }
     }
 
-    /* ======================================================
-       🔹 STEP 2: PREPARE STOCKS WITH COST
-    ====================================================== */
+    // STEP 2: Prepare Stocks with cost
     const invoiceStocks = [];
-
     for (const item of Stocks) {
       const productId = String(item.productId);
-
-      // 🔥 Get oldest stock row (FIFO) to fetch cost
-      const stockRow = await StockModel.findOne({ productId }).sort({
-        createdAt: 1,
-      });
-
+      const stockRow = await StockModel.findOne({ productId }).sort({ createdAt: 1 });
       if (!stockRow) {
-        return res
-          .status(400)
-          .json({ message: `Stock not found for ${item.name}` });
+        return res.status(400).json({ message: `Stock not found for ${item.name}` });
       }
 
       invoiceStocks.push({
@@ -251,13 +334,11 @@ app.post("/createinvoice", async (req, res) => {
         quantity: Number(item.quantity),
         Unit: item.Unit,
         price: Number(item.price),
-        cost: Number(stockRow.cost), // ✅ REAL COST FROM STOCK
+        cost: Number(stockRow.cost),
       });
     }
 
-    /* ======================================================
-       🔹 STEP 3: SAVE INVOICE
-    ====================================================== */
+    // STEP 3: Save Invoice with userId
     const invoice = new Invoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
@@ -269,20 +350,17 @@ app.post("/createinvoice", async (req, res) => {
       Discount: Number(Discount),
       PaymentMethod,
       TotalAmount: Number(TotalAmount),
+      userId: req.user.id, // 🔹 attach userId
     });
 
     await invoice.save();
 
-    /* ======================================================
-       🔹 STEP 4: FIFO STOCK DEDUCTION
-    ====================================================== */
+    // STEP 4: Deduct stock (FIFO)
     for (const item of invoiceStocks) {
       let remainingQty = Number(item.quantity);
       const productId = String(item.productId);
 
-      const stockRows = await StockModel.find({ productId }).sort({
-        createdAt: 1,
-      });
+      const stockRows = await StockModel.find({ productId }).sort({ createdAt: 1 });
 
       for (const stock of stockRows) {
         if (remainingQty <= 0) break;
@@ -305,33 +383,44 @@ app.post("/createinvoice", async (req, res) => {
   }
 });
 
-
-
-
-
-app.get("/credits", async (req, res) => {
-  Credits.find()
-    .then((credits) => res.json(credits))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all invoices for this user
+app.get("/invoices", verifyToken, async (req, res) => {
+  try {
+    const invoices = await Invoice.find({ userId: req.user.id });
+    res.json(invoices);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/invoices/:invoiceId/paymentMethod", async (req, res) => {
+// Get invoice by ID (only if belongs to this user)
+app.get("/invoices/:id", verifyToken, async (req, res) => {
+  try {
+    const invoice = await Invoice.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+    res.json(invoice);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Update payment method (only if invoice belongs to user)
+app.put("/invoices/:invoiceId/paymentMethod", verifyToken, async (req, res) => {
   const { invoiceId } = req.params;
   const { paymentMethod } = req.body;
 
   try {
-    // Update Invoice
-    const updatedInvoice = await Invoice.findByIdAndUpdate(
-      invoiceId,
+    const updatedInvoice = await Invoice.findOneAndUpdate(
+      { _id: invoiceId, userId: req.user.id },
       { PaymentMethod: paymentMethod },
       { new: true }
     );
 
-    if (!updatedInvoice) return res.status(404).send("Invoice not found");
+    if (!updatedInvoice) return res.status(404).json({ message: "Invoice not found" });
 
-    // If method changed from Credit to something else, remove from Credits
+    // If changed from Credit to another method, remove from Credits
     if (paymentMethod !== "Credit") {
-      await Credits.findByIdAndDelete(invoiceId);
+      await Credits.findOneAndDelete({ invoiceId, userId: req.user.id });
     }
 
     res.json({ message: "Payment method updated", updatedInvoice });
@@ -341,151 +430,283 @@ app.put("/invoices/:invoiceId/paymentMethod", async (req, res) => {
   }
 });
 
-
-
-app.get("/invoices", async (req, res) => {
-  Invoice.find()
-    .then((invoices) => res.json(invoices))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get credits for this user
+app.get("/credits", verifyToken, async (req, res) => {
+  try {
+    const credits = await Credits.find({ userId: req.user.id });
+    res.json(credits);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/invoices/:id", async (req, res) => {
-  Invoice.findById(req.params.id)
-    .then((invoice) => res.json(invoice))
-    .catch((err) => res.status(400).json("Error: " + err));
-});
 
 // Unit
 
-app.post("/createunit", async (req, res) => {
-  Unit.create(req.body)
-    .then((unit) => res.json(unit))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Create Unit - attach userId
+app.post("/createunit", verifyToken, async (req, res) => {
+  try {
+    const unit = new Unit({
+      ...req.body,
+      userId: req.user.id, // 🔹 attach userId
+    });
+    await unit.save();
+    res.json(unit);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/units", async (req, res) => {
-  Unit.find()
-    .then((units) => res.json(units))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all units for this user
+app.get("/units", verifyToken, async (req, res) => {
+  try {
+    const units = await Unit.find({ userId: req.user.id });
+    res.json(units);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/units/:id", async (req, res) => {
-  Unit.findById(req.params.id)
-    .then((unit) => res.json(unit))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get single unit by ID (only if belongs to this user)
+app.get("/units/:id", verifyToken, async (req, res) => {
+  try {
+    const unit = await Unit.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!unit) return res.status(404).json({ message: "Unit not found" });
+    res.json(unit);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/units/:id", async (req, res) => {
-  Unit.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((unit) => res.json(unit))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Update unit (only if belongs to this user)
+app.put("/units/:id", verifyToken, async (req, res) => {
+  try {
+    const updatedUnit = await Unit.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!updatedUnit) return res.status(404).json({ message: "Unit not found" });
+    res.json(updatedUnit);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.delete("/units/:id", async (req, res) => {
-  Unit.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Unit deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Delete unit (only if belongs to this user)
+app.delete("/units/:id", verifyToken, async (req, res) => {
+  try {
+    const deletedUnit = await Unit.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!deletedUnit) return res.status(404).json({ message: "Unit not found" });
+    res.json({ message: "Unit deleted." });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
 
-app.post("/createbrand", async (req, res) => {
-  Brand.create(req.body)
-    .then((brand) => res.json(brand))
-    .catch((err) => res.status(400).json("Error: " + err));
+
+// Brands - user-specific
+
+// Create brand
+app.post("/createbrand", verifyToken, async (req, res) => {
+  try {
+    const brand = new Brand({
+      ...req.body,
+      userId: req.user.id, // attach userId
+    });
+    await brand.save();
+    res.json(brand);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/brands", async (req, res) => {
-  Brand.find()
-    .then((brands) => res.json(brands))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all brands for this user
+app.get("/brands", verifyToken, async (req, res) => {
+  try {
+    const brands = await Brand.find({ userId: req.user.id });
+    res.json(brands);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/brands/:id", async (req, res) => {
-  Brand.findById(req.params.id)
-    .then((brand) => res.json(brand))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get single brand by ID (user-specific)
+app.get("/brands/:id", verifyToken, async (req, res) => {
+  try {
+    const brand = await Brand.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!brand) return res.status(404).json({ message: "Brand not found" });
+    res.json(brand);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/brands/:id", async (req, res) => {
-  Brand.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((brand) => res.json(brand))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Update brand (user-specific)
+app.put("/brands/:id", verifyToken, async (req, res) => {
+  try {
+    const updatedBrand = await Brand.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!updatedBrand) return res.status(404).json({ message: "Brand not found" });
+    res.json(updatedBrand);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.delete("/brands/:id", async (req, res) => {
-  Brand.findByIdAndDelete(req.params.id)
-    .then(() => res.json("brand deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Delete brand (user-specific)
+app.delete("/brands/:id", verifyToken, async (req, res) => {
+  try {
+    const deletedBrand = await Brand.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!deletedBrand) return res.status(404).json({ message: "Brand not found" });
+    res.json({ message: "Brand deleted." });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.post("/createitemcategory", async (req, res) => {
-  Itemcategory.create(req.body)
-    .then((itemcategory) => res.json(itemcategory))
-    .catch((err) => res.status(400).json("Error: " + err));
+
+// Itemcategory - user-specific
+
+// Create itemcategory
+app.post("/createitemcategory", verifyToken, async (req, res) => {
+  try {
+    const itemcategory = new Itemcategory({
+      ...req.body,
+      userId: req.user.id,
+    });
+    await itemcategory.save();
+    res.json(itemcategory);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/itemcategorys", async (req, res) => {
-  Itemcategory.find()
-    .then((itemcategorys) => res.json(itemcategorys))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all itemcategories for this user
+app.get("/itemcategorys", verifyToken, async (req, res) => {
+  try {
+    const itemcategories = await Itemcategory.find({ userId: req.user.id });
+    res.json(itemcategories);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/itemcategorys/:id", async (req, res) => {
-  Itemcategory.findById(req.params.id)
-    .then((itemcategory) => res.json(itemcategory))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get single itemcategory by ID (user-specific)
+app.get("/itemcategorys/:id", verifyToken, async (req, res) => {
+  try {
+    const itemcategory = await Itemcategory.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!itemcategory) return res.status(404).json({ message: "Item category not found" });
+    res.json(itemcategory);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/itemcategorys/:id", async (req, res) => {
-  Itemcategory.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((itemcategory) => res.json(itemcategory))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Update itemcategory (user-specific)
+app.put("/itemcategorys/:id", verifyToken, async (req, res) => {
+  try {
+    const updatedItemcategory = await Itemcategory.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!updatedItemcategory) return res.status(404).json({ message: "Item category not found" });
+    res.json(updatedItemcategory);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.delete("/itemcategorys/:id", async (req, res) => {
-  Itemcategory.findByIdAndDelete(req.params.id)
-    .then(() => res.json("itemcategory deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Delete itemcategory (user-specific)
+app.delete("/itemcategorys/:id", verifyToken, async (req, res) => {
+  try {
+    const deletedItemcategory = await Itemcategory.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!deletedItemcategory) return res.status(404).json({ message: "Item category not found" });
+    res.json({ message: "Item category deleted." });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 
 // Customers
 
-app.post("/Customers", async (req, res) => {
-  Customers.create(req.body)
-    .then((customer) => res.json(customer))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Customers - user-specific
+
+// Create customer
+app.post("/Customers", verifyToken, async (req, res) => {
+  try {
+    const customer = new Customers({
+      ...req.body,
+      userId: req.user.id, // attach userId
+    });
+    await customer.save();
+    res.json(customer);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/Customers", async (req, res) => {
-  Customers.find()
-    .then((customers) => res.json(customers))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get all customers for this user
+app.get("/Customers", verifyToken, async (req, res) => {
+  try {
+    const customers = await Customers.find({ userId: req.user.id });
+    res.json(customers);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/Customers/:id", async (req, res) => {
-  Customers.findById(req.params.id)
-    .then((customer) => res.json(customer))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get single customer by ID (user-specific)
+app.get("/Customers/:id", verifyToken, async (req, res) => {
+  try {
+    const customer = await Customers.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!customer) return res.status(404).json({ message: "Customer not found" });
+    res.json(customer);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.put("/Customers/:id", async (req, res) => {
-  Customers.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((customer) => res.json(customer))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Update customer (user-specific)
+app.put("/Customers/:id", verifyToken, async (req, res) => {
+  try {
+    const updatedCustomer = await Customers.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!updatedCustomer) return res.status(404).json({ message: "Customer not found" });
+    res.json(updatedCustomer);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.delete("/Customers/:id", async (req, res) => {
-  Customers.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Customer deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Delete customer (user-specific)
+app.delete("/Customers/:id", verifyToken, async (req, res) => {
+  try {
+    const deletedCustomer = await Customers.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!deletedCustomer) return res.status(404).json({ message: "Customer not found" });
+    res.json({ message: "Customer deleted." });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
+
 
 // Purchasebill
 
 
 
-app.post("/createpurchaseinvoice", async (req, res) => {
+// Create purchase invoice (user-specific)
+app.post("/createpurchaseinvoice", verifyToken, async (req, res) => {
   try {
     const {
       InvoiceNumber,
@@ -503,6 +724,7 @@ app.post("/createpurchaseinvoice", async (req, res) => {
       return res.status(400).json({ message: "No stock items provided" });
     }
 
+    // Attach userId
     const purchase = new PurchaseInvoice({
       InvoiceNumber,
       date: date ? new Date(date) : new Date(),
@@ -513,16 +735,16 @@ app.post("/createpurchaseinvoice", async (req, res) => {
       Discount,
       PaymentMethod,
       TotalAmount,
+      userId: req.user.id, // ✅ user-specific
     });
 
     await purchase.save();
 
-    // 🔹 ADD STOCK
+    // 🔹 ADD STOCK (also user-specific)
     for (const item of Stocks) {
       if (!item.productId || !item.quantity) continue;
 
       const productId = new mongoose.Types.ObjectId(item.productId);
-
       const cost = Number(item.Cost || item.cost);
       const mrp = Number(item.MRP);
 
@@ -530,11 +752,12 @@ app.post("/createpurchaseinvoice", async (req, res) => {
         throw new Error(`Cost/MRP missing for ${item.name}`);
       }
 
+      // Check if stock for this user already exists with same cost
       const existingStock = await StockModel.findOne({
-  productId,
-  cost
-});
-
+        productId,
+        cost,
+        userId: req.user.id, // ✅ filter by user
+      });
 
       if (existingStock) {
         existingStock.quantity += Number(item.quantity);
@@ -549,6 +772,7 @@ app.post("/createpurchaseinvoice", async (req, res) => {
           Unit: item.Unit,
           Barcode: item.Barcode,
           Brand: item.Brand || null,
+          userId: req.user.id, // ✅ attach user
         });
       }
     }
@@ -560,30 +784,26 @@ app.post("/createpurchaseinvoice", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-app.get("/purchaseinvoices", async (req, res) => {
-  PurchaseInvoice.find()
-    .then((purchaseinvoices) => res.json(purchaseinvoices))
-    .catch((err) => res.status(400).json("Error: " + err));
+// Get purchase invoices for logged-in user
+app.get("/purchaseinvoices", verifyToken, async (req, res) => {
+  try {
+    const purchaseinvoices = await PurchaseInvoice.find({ userId: req.user.id });
+    res.json(purchaseinvoices);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-app.get("/stocks", async (req, res) => {
+// Get stocks for logged-in user
+app.get("/stocks", verifyToken, async (req, res) => {
   try {
-    const stocks = await StockModel.find();
+    const stocks = await StockModel.find({ userId: req.user.id });
     res.json(stocks);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 

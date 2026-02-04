@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./context/AuthProvider";
 
 const AddSuppliers = () => {
   const [SupplierName, setSupplierName] = useState("");
@@ -11,6 +12,7 @@ const AddSuppliers = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   const SubmitData = async (e) => {
     e.preventDefault();
@@ -27,7 +29,11 @@ const AddSuppliers = () => {
         SupplierName,
         ContactPerson,
         ContactNumber,
-      });
+      },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
 
       console.log("Supplier added successfully:", response.data);
 

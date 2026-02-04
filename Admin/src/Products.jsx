@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import "../src/Css/Suppliers.css";
 import "./Css/Products.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Products = () => {
   const [Products, setProducts] = useState([]);
@@ -20,7 +21,11 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -46,7 +51,11 @@ const Products = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/products/${selectedProductId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/products/${selectedProductId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setProducts(Products.filter((p) => p._id !== selectedProductId));
       setShowDeleteConfirm(false);
     } catch (error) {

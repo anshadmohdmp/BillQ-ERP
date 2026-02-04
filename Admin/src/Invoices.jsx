@@ -3,19 +3,27 @@ import React, { useEffect, useState } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
 import { MdPrint } from "react-icons/md";
 import "./Css/Invoices.css";
+import { useAuth } from "./context/AuthProvider";
 
 const Invoices = () => {
   const [Invoices, setInvoices] = useState([]);
   const [showPrintConfirm, setShowPrintConfirm] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
 
+  const { user } = useAuth(); 
+
   useEffect(() => {
     fetchInvoices();
   }, []);
 
+
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/invoices`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/invoices`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setInvoices(response.data);
     } catch (error) {
       console.error("Error fetching invoices:", error);
@@ -33,7 +41,11 @@ const Invoices = () => {
   const handlePrint = async () => {
     setShowPrintConfirm(false);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/invoices/${selectedInvoiceId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/invoices/${selectedInvoiceId}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       const billData = response.data;
 
       const Subtotal =

@@ -3,6 +3,7 @@ import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "../src/Css/Suppliers.css";
+import { useAuth } from "./context/AuthProvider";
 
 
 const Editbrand = () => {
@@ -12,10 +13,15 @@ const Editbrand = () => {
 
   const Navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/brands/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/brands/${id}`,{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  })
       .then((response) => {
         setBrand(response.data.Brand);
       })
@@ -30,7 +36,11 @@ const Editbrand = () => {
     }
     setError("");
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/brands/${id}`, { Brand });
+      await axios.put(`${import.meta.env.VITE_API_URL}/brands/${id}`, { Brand },{
+    headers: {
+      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
+    },
+  });
       setShowSuccessModal(true); // show success modal
     } catch (error) {
       console.error("❌ There was an error!", error);
