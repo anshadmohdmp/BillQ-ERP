@@ -11,6 +11,7 @@ const StockModel = require("./Models/Stocks");
 const Credits = require("./Models/Credits");
 const mongoose = require("mongoose");
 const Brand = require("./Models/Brands");
+const Itemcategory = require("./Models/Itemcategory");
 require('dotenv').config();
 
 
@@ -357,6 +358,36 @@ app.put("/brands/:id", async (req, res) => {
 app.delete("/brands/:id", async (req, res) => {
   Brand.findByIdAndDelete(req.params.id)
     .then(() => res.json("brand deleted."))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.post("/createitemcategory", async (req, res) => {
+  Itemcategory.create(req.body)
+    .then((itemcategory) => res.json(itemcategory))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.get("/itemcategorys", async (req, res) => {
+  Itemcategory.find()
+    .then((itemcategorys) => res.json(itemcategorys))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.get("/itemcategorys/:id", async (req, res) => {
+  Itemcategory.findById(req.params.id)
+    .then((itemcategory) => res.json(itemcategory))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.put("/itemcategorys/:id", async (req, res) => {
+  Itemcategory.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    .then((itemcategory) => res.json(itemcategory))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.delete("/itemcategorys/:id", async (req, res) => {
+  Itemcategory.findByIdAndDelete(req.params.id)
+    .then(() => res.json("itemcategory deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
