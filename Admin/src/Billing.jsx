@@ -174,6 +174,11 @@ const Billing = () => {
     quantity: 1,
     discount: 0,
     total: Number(product.MRP),
+
+    selectedProduct: {
+      value: product._id,
+      label: `${product.name} (${product.Brand || "No Brand"})`,
+    },
   };
 
   setSelectedStocks(updated);
