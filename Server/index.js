@@ -120,47 +120,51 @@ const verifyToken = (req, res, next) => {
 
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
+  console.log("Received forgot-password request for:", email);
+
   if (!email) return res.status(400).json({ message: "Email required" });
 
   try {
     const user = await User.findOne({ email });
+    console.log("Found user:", user);
+
     if (!user) return res.status(404).json({ message: "Email not found" });
 
-    // Generate token
     const token = crypto.randomBytes(32).toString("hex");
     user.resetToken = token;
-    user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
+    user.resetTokenExpiry = Date.now() + 3600000;
     await user.save();
+    console.log("Token saved:", token);
 
-    // Configure Nodemailer
     const transporter = nodemailer.createTransport({
-      service: "Gmail", // or use any other email service
+      service: "Gmail",
       auth: {
-        user: process.env.EMAIL_USER, // your email
-        pass: process.env.EMAIL_PASS, // app password if using Gmail
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
-
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Reset Request",
       html: `<p>Hello ${user.username},</p>
-             <p>You requested to reset your password. Click the link below to set a new password:</p>
-             <a href="${resetLink}">${resetLink}</a>
-             <p>This link will expire in 1 hour.</p>`,
+             <p>You requested to reset your password. Click the link below:</p>
+             <a href="${resetLink}">${resetLink}</a>`,
     };
 
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email info:", info);
 
     res.json({ message: "Password reset link sent to your email" });
   } catch (err) {
-    console.error(err);
+    console.error("Forgot password error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
 
 app.post("/reset-password/:token", async (req, res) => {
   const { token } = req.params;
