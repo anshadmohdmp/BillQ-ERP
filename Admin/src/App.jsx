@@ -1,10 +1,7 @@
 import React from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Home from "./Home";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import Addproducts from "./Addproducts";
-import Sidebar from "./Sidebar";
 import AddCategory from "./AddCategory";
 import AddSuppliers from "./AddSuppliers";
 import Suppliers from "./Suppliers";
@@ -16,7 +13,6 @@ import Editsuppliers from "./Editsuppliers";
 import Editunit from "./Editunit";
 import EditCategory from "./EditCategory";
 import Welcome from "./Welcome";
-
 import Purchaseinvoices from "./Purchaseinvoices";
 import Customers from "./Customers";
 import AddCustomers from "./AddCustomers";
@@ -29,48 +25,232 @@ import Brand from "./Brand";
 import Editbrand from "./Editbrand";
 import Itemcategory from "./Itemcategory";
 import EditItemcategory from "./EditItemcategory";
+import Sidebar from "./Sidebar";
+import Login from "./Login";
+import Register from "./Register";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
 
-// Separate component so we can use hooks like useLocation
-const AppContent= () => {
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
+// App Content with Sidebar logic
+const AppContent = () => {
   const location = useLocation();
-
-  // Hide sidebar only on Welcome page
-  const hideSidebar = location.pathname === "/";
+  const hideSidebar = ["/", "/login", "/register"].includes(location.pathname);
 
   return (
-    
     <div className={`layout ${hideSidebar ? "no-sidebar" : ""}`}>
       {!hideSidebar && <Sidebar />}
 
-<div className="page-content">
-      <Routes>
-        <Route path="/" element={<Welcome />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/addproducts" element={<Addproducts />} />
-        <Route path="/addcategory" element={<AddCategory />} />
-        <Route path="/addsuppliers" element={<AddSuppliers />} />
-        <Route path="/Products" element={<Products />} />
-        <Route path="/suppliers" element={<Suppliers />} />
-        <Route path="/Customers" element={<Customers />} />
-        <Route path="/brand" element={<Brand />} />
-        <Route path="/itemcategory" element={<Itemcategory />} /> 
-        <Route path="/billing" element={<Billing />} />
-        <Route path="/purchaseinvoices" element={<Purchaseinvoices/>} />
-        <Route path="/addCustomers" element={<AddCustomers/>} />
-        <Route path="/editCustomers/:id" element={<EditCustomers />} />
-        <Route path="/unit" element={<Unit />} />
-        <Route path="/invoices" element={<Invoices />} />
-        <Route path="/credits" element={<Credits />} />
-        <Route path="/editstock/:id" element={<Editstock />} />
-        <Route path="/editsuppliers/:id" element={<Editsuppliers />} />
-        <Route path="/editunit/:id" element={<Editunit />} />
-        <Route path="/editbrand/:id" element={<Editbrand />} />
-        <Route path="/edititemcategory/:id" element={<EditItemcategory />} />
-        <Route path="/editcategory/:id" element={<EditCategory />} />
-        <Route path="/purchasebill" element={<PurchaseBill />} />
-        <Route path="/stocks" element={<Stocks />} />
-      </Routes>
-    </div>
+      <div className="page-content">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Welcome />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/addproducts"
+            element={
+              <ProtectedRoute>
+                <Addproducts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/addcategory"
+            element={
+              <ProtectedRoute>
+                <AddCategory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/addsuppliers"
+            element={
+              <ProtectedRoute>
+                <AddSuppliers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/Products"
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/suppliers"
+            element={
+              <ProtectedRoute>
+                <Suppliers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/Customers"
+            element={
+              <ProtectedRoute>
+                <Customers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/brand"
+            element={
+              <ProtectedRoute>
+                <Brand />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/itemcategory"
+            element={
+              <ProtectedRoute>
+                <Itemcategory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/billing"
+            element={
+              <ProtectedRoute>
+                <Billing />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/purchaseinvoices"
+            element={
+              <ProtectedRoute>
+                <Purchaseinvoices />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/addCustomers"
+            element={
+              <ProtectedRoute>
+                <AddCustomers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editCustomers/:id"
+            element={
+              <ProtectedRoute>
+                <EditCustomers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/unit"
+            element={
+              <ProtectedRoute>
+                <Unit />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invoices"
+            element={
+              <ProtectedRoute>
+                <Invoices />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/credits"
+            element={
+              <ProtectedRoute>
+                <Credits />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editstock/:id"
+            element={
+              <ProtectedRoute>
+                <Editstock />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editsuppliers/:id"
+            element={
+              <ProtectedRoute>
+                <Editsuppliers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editunit/:id"
+            element={
+              <ProtectedRoute>
+                <Editunit />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editbrand/:id"
+            element={
+              <ProtectedRoute>
+                <Editbrand />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edititemcategory/:id"
+            element={
+              <ProtectedRoute>
+                <EditItemcategory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editcategory/:id"
+            element={
+              <ProtectedRoute>
+                <EditCategory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/purchasebill"
+            element={
+              <ProtectedRoute>
+                <PurchaseBill />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/stocks"
+            element={
+              <ProtectedRoute>
+                <Stocks />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </div>
     </div>
   );
 };
