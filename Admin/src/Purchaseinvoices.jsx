@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
 import { MdPrint } from "react-icons/md";
 import "./Css/Purchaseinvoices.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Purchaseinvoices = () => {
   const [Invoices, setInvoices] = useState([]);

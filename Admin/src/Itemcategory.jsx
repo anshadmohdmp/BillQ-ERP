@@ -3,7 +3,7 @@ import { Button, Form, Card, Table, Modal } from "react-bootstrap";
 import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Itemcategory = () => {
   const [Itemcategory, setItemcategory] = useState("");

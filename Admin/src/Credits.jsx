@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Table, Card, Button } from "react-bootstrap";
 import "./Css/Credits.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Credits = () => {
     const [Credits, setCredits] = useState([]);

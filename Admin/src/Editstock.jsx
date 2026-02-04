@@ -3,7 +3,7 @@ import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "./Css/AddProducts.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Editstock = () => {
   const [Barcode, setBarcode] = useState("");

@@ -4,7 +4,7 @@ import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddCategory.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 
 const AddCategory = () => {

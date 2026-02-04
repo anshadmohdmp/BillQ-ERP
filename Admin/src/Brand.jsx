@@ -4,7 +4,7 @@ import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import "./Css/Brand.css"
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 
 const Brand = () => {

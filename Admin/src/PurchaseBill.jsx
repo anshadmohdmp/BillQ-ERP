@@ -6,7 +6,7 @@ import Select from "react-select";
 import { v4 as uuidv4 } from 'uuid';
 import "./Css/Purchasebilling.css";
 import { Html5Qrcode } from "html5-qrcode";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const PurchaseBill = () => {
   const [SupplierName, setSupplierName] = useState("");

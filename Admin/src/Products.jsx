@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import "../src/Css/Suppliers.css";
 import "./Css/Products.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Products = () => {
   const [Products, setProducts] = useState([]);
@@ -14,6 +14,7 @@ const Products = () => {
   const [selectedProductId, setSelectedProductId] = useState(null);
 
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     fetchProducts();

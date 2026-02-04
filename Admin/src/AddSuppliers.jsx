@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const AddSuppliers = () => {
   const [SupplierName, setSupplierName] = useState("");

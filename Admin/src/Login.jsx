@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, Form, Button } from "react-bootstrap";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 
 const Login = () => {
@@ -12,6 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { login } = useAuth();
+
 
   const handleLogin = async (e) => {
   e.preventDefault();

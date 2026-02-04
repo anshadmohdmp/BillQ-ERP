@@ -6,7 +6,7 @@ import "./Css/AddProducts.css";
 import "./Css/Billing.css";
 import Select from "react-select";
 import { Html5Qrcode } from "html5-qrcode";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 
 

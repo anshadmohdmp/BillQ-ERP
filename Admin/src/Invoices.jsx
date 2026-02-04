@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
 import { MdPrint } from "react-icons/md";
 import "./Css/Invoices.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Invoices = () => {
   const [Invoices, setInvoices] = useState([]);

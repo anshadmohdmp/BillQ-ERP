@@ -4,7 +4,7 @@ import { Table, Card, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import "../src/Css/Customers.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Customers = () => {
   const [Customers, setCustomers] = useState([]);

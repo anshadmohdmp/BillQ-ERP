@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Table } from "react-bootstrap";
 import axios from "axios";
 import "./Css/Stocks.css";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 const Stocks = () => {
   const [Stocks, setStocks] = useState([]);

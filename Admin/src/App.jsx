@@ -30,7 +30,7 @@ import Login from "./Login";
 import Register from "./Register";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import { useAuth } from "./context/AuthProvider"; 
+import { useAuth } from "./AuthProvider"; 
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {

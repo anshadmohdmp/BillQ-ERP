@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddProducts.css";
 import { Html5Qrcode } from "html5-qrcode";
-import { useAuth } from "./context/AuthProvider";
+import { useAuth } from "./AuthProvider";
 
 
 const Addproducts = () => {
