@@ -23,7 +23,7 @@ app.use(cors({
 app.use(express.json());
 
 mongoose
-  .connect(process.env.MONGO_URL)
+  .connect([process.env.MONGO_URL, "http://localhost:5173"])
   .then(() => console.log("DB Connected"))
   .catch((err) => console.log("DB Connection Error: ", err));
 

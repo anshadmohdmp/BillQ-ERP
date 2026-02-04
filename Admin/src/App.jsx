@@ -25,6 +25,7 @@ import Products from "./Products";
 import Stocks from "./Stocks";
 import PurchaseBill from "./PurchaseBill";
 import Credits from "./Credits";
+import Brand from "./Brand";
 
 // Separate component so we can use hooks like useLocation
 const AppContent= () => {
@@ -48,6 +49,7 @@ const AppContent= () => {
         <Route path="/Products" element={<Products />} />
         <Route path="/suppliers" element={<Suppliers />} />
         <Route path="/Customers" element={<Customers />} />
+         <Route path="/brand" element={<Brand />} />
         <Route path="/billing" element={<Billing />} />
         <Route path="/purchaseinvoices" element={<Purchaseinvoices/>} />
         <Route path="/addCustomers" element={<AddCustomers/>} />
