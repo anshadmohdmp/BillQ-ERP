@@ -132,16 +132,11 @@ app.post("/forgot-password", async (req, res) => {
     await user.save();
 
     const transporter = nodemailer.createTransport({
-      service: "Gmail",
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        pass: process.env.EMAIL_PASS, // must be App Password
       },
-    });
-
-    transporter.verify((error, success) => {
-      if (error) console.error("Transporter verification failed:", error);
-      else console.log("Transporter ready to send email");
     });
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
@@ -150,24 +145,20 @@ app.post("/forgot-password", async (req, res) => {
       to: email,
       subject: "Password Reset Request",
       html: `<p>Hello ${user.username},</p>
-             <p>You requested a password reset. Click the link below:</p>
+             <p>You requested a password reset. Click below:</p>
              <a href="${resetLink}">${resetLink}</a>
              <p>This link will expire in 1 hour.</p>`,
     };
 
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log("Email sent successfully:", info.response);
-      res.json({ message: "Password reset link sent to your email" });
-    } catch (err) {
-      console.error("Email send failed:", err);
-      res.status(500).json({ message: "Failed to send email", error: err.message });
-    }
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "Password reset link sent to your email" });
+
   } catch (err) {
     console.error("Forgot password error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 
