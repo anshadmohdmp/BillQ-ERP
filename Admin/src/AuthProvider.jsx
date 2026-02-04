@@ -1,21 +1,31 @@
-// AuthProvider.jsx
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const token = localStorage.getItem("token");
-    return token ? { token } : null;
-  });
+  const [user, setUser] = useState(null);
 
-  const login = (token, username) => {
-    localStorage.setItem("token", token);
-    setUser({ token, username });
+  // ✅ Restore session ONLY if remembered
+  useEffect(() => {
+    const storedAuth = localStorage.getItem("auth");
+    if (storedAuth) {
+      setUser(JSON.parse(storedAuth));
+    }
+  }, []);
+
+  // ✅ Login with rememberMe
+  const login = (token, username, rememberMe) => {
+    const authData = { token, username };
+
+    setUser(authData);
+
+    if (rememberMe) {
+      localStorage.setItem("auth", JSON.stringify(authData));
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("auth");
     setUser(null);
   };
 

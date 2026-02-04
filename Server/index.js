@@ -16,7 +16,8 @@ require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("./Models/User");
-
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 
 const app = express();
@@ -39,33 +40,24 @@ mongoose
 
 app.post("/register", async (req, res) => {
   try {
-    const { firstName, lastName, username, password } = req.body;
+    const { username, email, password } = req.body;
 
-    // Validation
-    if (!firstName || !lastName || !username || !password) {
+    if (!username || !email || !password)
       return res.status(400).json({ message: "All fields required" });
-    }
 
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser)
+      return res.status(400).json({ message: "Username or Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ username, email, password: hashedPassword });
 
-    await User.create({
-      firstName,
-      lastName,
-      username,
-      password: hashedPassword,
-    });
-
-    res.status(201).json({ message: "User created successfully" });
+    res.json({ message: "User created successfully" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 app.post("/login", async (req, res) => {
@@ -106,6 +98,80 @@ const verifyToken = (req, res, next) => {
     res.status(403).json({ message: "Invalid token" });
   }
 };
+
+app.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email required" });
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "Email not found" });
+
+    // Generate token
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetToken = token;
+    user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // Configure Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: "Gmail", // or use any other email service
+      auth: {
+        user: process.env.EMAIL_USER, // your email
+        pass: process.env.EMAIL_PASS, // app password if using Gmail
+      },
+    });
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Hello ${user.username},</p>
+             <p>You requested to reset your password. Click the link below to set a new password:</p>
+             <a href="${resetLink}">${resetLink}</a>
+             <p>This link will expire in 1 hour.</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: "Password reset link sent to your email" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/reset-password/:token", async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  if (!password) return res.status(400).json({ message: "Password required" });
+
+  try {
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) return res.status(400).json({ message: "Invalid or expired token" });
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    res.json({ message: "Password reset successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 
 
 // Add Products

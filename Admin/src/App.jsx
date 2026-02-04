@@ -31,6 +31,7 @@ import Register from "./Register";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { useAuth } from "./AuthProvider"; 
+import ForgotPassword from "./ForgetPassword";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -45,7 +46,7 @@ const ProtectedRoute = ({ children }) => {
 // App Content with Sidebar logic
 const AppContent = () => {
   const location = useLocation();
-  const hideSidebar = ["/", "/login", "/register"].includes(location.pathname);
+  const hideSidebar = ["/", "/login", "/register", "/forgot-password", "reset-password/:token"].includes(location.pathname);
 
   return (
     <div className={`layout ${hideSidebar ? "no-sidebar" : ""}`}>
@@ -57,6 +58,8 @@ const AppContent = () => {
           <Route path="/" element={<Welcome />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Protected Routes */}
           <Route
@@ -83,6 +86,7 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+          
           <Route
             path="/addsuppliers"
             element={

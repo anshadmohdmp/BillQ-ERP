@@ -8,6 +8,7 @@ const Register = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -24,7 +25,7 @@ const Register = () => {
     setError("");
     setSuccess("");
 
-    if (!firstName || !lastName || !username || !password || !confirmPassword) {
+    if (!firstName || !lastName || !username || !password || !confirmPassword || !email) {
       setError("All fields are required");
       return;
     }
@@ -40,6 +41,7 @@ const Register = () => {
         lastName,
         username,
         password,
+        email,
       });
 
       setSuccess("Registered successfully! Redirecting to login...");
@@ -81,6 +83,17 @@ const Register = () => {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Enter last name"
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
             />
           </Form.Group>
 
