@@ -32,6 +32,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { useAuth } from "./AuthProvider"; 
 import ForgotPassword from "./ForgetPassword";
+import ResetPassword from "./ResetPassword";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {

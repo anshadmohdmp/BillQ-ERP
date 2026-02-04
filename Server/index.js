@@ -40,23 +40,42 @@ mongoose
 
 app.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { firstName, lastName, username, email, password } = req.body;
 
-    if (!username || !email || !password)
+    // ✅ validate all fields
+    if (!firstName || !lastName || !username || !email || !password) {
       return res.status(400).json({ message: "All fields required" });
+    }
 
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser)
-      return res.status(400).json({ message: "Username or Email already exists" });
+    // ✅ check if username or email already exists
+    const existingUser = await User.findOne({
+      $or: [{ username }, { email }],
+    });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "Username or Email already exists" });
+    }
 
+    // ✅ hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({ username, email, password: hashedPassword });
+
+    // ✅ create user
+    await User.create({
+      firstName,
+      lastName,
+      username,
+      email,
+      password: hashedPassword,
+    });
 
     res.json({ message: "User created successfully" });
   } catch (err) {
+    console.error(err); // log the actual error for debugging
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 
