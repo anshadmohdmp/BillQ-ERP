@@ -1,0 +1,14 @@
+.brands{
+        min-height: 100vh;
+        background-color: #3e3e3e;
+        padding: 20px;
+}
+
+@media (max-width: 768px) {
+.brands{
+        margin-left: 0;
+        padding: 10px;
+        margin-top: 0;
+        padding-top: 60px;
+    }
+}

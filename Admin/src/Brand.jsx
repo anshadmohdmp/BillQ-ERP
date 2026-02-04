@@ -3,6 +3,7 @@ import { Button, Form, Card, Table, Modal } from "react-bootstrap";
 import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import "./Css/Brand.css"
 
 
 const Brand = () => {
@@ -13,7 +14,7 @@ const Brand = () => {
   const [showEditConfirm, setShowEditConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ new state
-  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [selectedBrandId, setSelectedBrandId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -26,7 +27,7 @@ const Brand = () => {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/brands`);
       setFetchedBrands(response.data);
     } catch (error) {
-      console.error("Error fetching unit data:", error);
+      console.error("Error fetching Brand data:", error);
     }
   };
 
@@ -44,7 +45,7 @@ const Brand = () => {
       setShowSuccessModal(true); // ✅ show success modal
     } catch (error) {
       console.error("❌ There was an error!", error);
-      setError("An error occurred while adding the Unit.");
+      setError("An error occurred while adding the Brand.");
     }
   };
 
@@ -58,38 +59,38 @@ const Brand = () => {
   };
 
   // Edit
-  const confirmEditUnit = (id) => {
-    setSelectedUnitId(id);
+  const confirmEditBrand = (id) => {
+    setSelectedBrandId(id);
     setShowEditConfirm(true);
   };
 
   const handleEdit = () => {
     setShowEditConfirm(false);
-    navigate(`/editunit/${selectedUnitId}`);
+    navigate(`/editBrand/${selectedBrandId}`);
   };
 
   // Delete
-  const confirmDeleteUnit = (id) => {
-    setSelectedUnitId(id);
+  const confirmDeleteBrand = (id) => {
+    setSelectedBrandId(id);
     setShowDeleteConfirm(true);
   };
 
   const handleDelete = async () => {
     setShowDeleteConfirm(false);
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/brands/${selectedUnitId}`);
-      setFetchedBrands(FetchedBrands.filter((unit) => unit._id !== selectedUnitId));
+      await axios.delete(`${import.meta.env.VITE_API_URL}/brands/${selectedBrandId}`);
+      setFetchedBrands(FetchedBrands.filter((Brand) => Brand._id !== selectedBrandId));
     } catch (error) {
       console.error("❌ There was an error!", error);
-      alert("An error occurred while deleting the Unit.");
+      alert("An error occurred while deleting the Brand.");
     }
   };
 
   return (
     <div
-      className="Brands"
+      className="brands"
     >
-      {/* Add Unit Card */}
+      {/* Add Brand Card */}
       <Card
         className="responsive-card"
         style={{
@@ -112,16 +113,16 @@ const Brand = () => {
             textShadow: "0 0 6px rgba(255,255,255,0.1)",
           }}
         >
-          Add Unit
+          Add Brand
         </h2>
 
         <Form onSubmit={SubmitData}>
           <Form.Group className="mb-4">
-            <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Unit Name</Form.Label>
+            <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Brand Name</Form.Label>
             <Form.Control
               onChange={(e) => setBrand(e.target.value)}
               type="text"
-              placeholder="Enter Unit Name"
+              placeholder="Enter Brand Name"
               value={Brand}
               style={inputStyle}
             />
@@ -196,17 +197,17 @@ const Brand = () => {
             </thead>
             <tbody>
               {FetchedBrands.length > 0 ? (
-                FetchedBrands.map((unit, index) => (
-                  <tr key={unit._id}>
+                FetchedBrands.map((Brand, index) => (
+                  <tr key={Brand._id}>
                     <td>{index + 1}</td>
-                    <td>{unit.Brand}</td>
+                    <td>{Brand.Brand}</td>
                     <td style={{ textAlign: "center" }}>
                       <MdOutlineEdit
-                        onClick={() => confirmEditUnit(unit._id)}
+                        onClick={() => confirmEditBrand(Brand._id)}
                         style={{ marginRight: "10px", cursor: "pointer" }}
                       />
                       <MdDeleteOutline
-                        onClick={() => confirmDeleteUnit(unit._id)}
+                        onClick={() => confirmDeleteBrand(Brand._id)}
                         style={{ cursor: "pointer" }}
                       />
                     </td>
@@ -235,7 +236,7 @@ const Brand = () => {
           }}
         >
           <h4>⚠️ Confirm Edit</h4>
-          <p style={{ color: "#ccc" }}>Are you sure you want to edit this unit?</p>
+          <p style={{ color: "#ccc" }}>Are you sure you want to edit this Brand?</p>
           <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "15px" }}>
             <Button
               variant="secondary"
@@ -266,7 +267,7 @@ const Brand = () => {
           }}
         >
           <h4>⚠️ Confirm Delete</h4>
-          <p style={{ color: "#ccc" }}>Are you sure you want to delete this unit?</p>
+          <p style={{ color: "#ccc" }}>Are you sure you want to delete this Brand?</p>
           <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "15px" }}>
             <Button
               variant="secondary"
@@ -296,8 +297,8 @@ const Brand = () => {
             padding: "30px",
           }}
         >
-          <h4 style={{ color: "#ffffffff", marginBottom: "10px" }}> Unit Added Successfully</h4>
-          <p style={{ color: "#ccc" }}>Your new unit has been saved successfully.</p>
+          <h4 style={{ color: "#ffffffff", marginBottom: "10px" }}> Brand Added Successfully</h4>
+          <p style={{ color: "#ccc" }}>Your new Brand has been saved successfully.</p>
           <Button
             onClick={() => setShowSuccessModal(false)}
             style={{
@@ -317,4 +318,4 @@ const Brand = () => {
   );
 };
 
-export default Unit;
+export default Brand;
