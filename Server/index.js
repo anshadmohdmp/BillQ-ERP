@@ -10,6 +10,7 @@ const PurchaseInvoice = require("./Models/PurchaseInvoice");
 const StockModel = require("./Models/Stocks");
 const Credits = require("./Models/Credits");
 const mongoose = require("mongoose");
+const Brand = require("./Models/Brands");
 require('dotenv').config();
 
 
@@ -325,6 +326,37 @@ app.put("/units/:id", async (req, res) => {
 app.delete("/units/:id", async (req, res) => {
   Unit.findByIdAndDelete(req.params.id)
     .then(() => res.json("Unit deleted."))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+
+app.post("/createbrand", async (req, res) => {
+  Brand.create(req.body)
+    .then((brand) => res.json(brand))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.get("/brands", async (req, res) => {
+  Brand.find()
+    .then((brands) => res.json(brands))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.get("/brands/:id", async (req, res) => {
+  Brand.findById(req.params.id)
+    .then((brand) => res.json(brand))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.put("/brands/:id", async (req, res) => {
+  Brand.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    .then((brand) => res.json(brand))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+
+app.delete("/brands/:id", async (req, res) => {
+  Brand.findByIdAndDelete(req.params.id)
+    .then(() => res.json("brand deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
