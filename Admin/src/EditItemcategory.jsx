@@ -4,9 +4,8 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "../src/Css/Suppliers.css";
 
-
-const Editbrand = () => {
-  const [Brand, setBrand] = useState("");
+const EditItemcategory = () => {
+  const [Itemcategory, setItemcategory] = useState("");
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -15,32 +14,32 @@ const Editbrand = () => {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/brands/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/itemcategorys/${id}`)
       .then((response) => {
-        setBrand(response.data.Brand);
+        setItemcategory(response.data.Itemcategory);
       })
-      .catch((error) => console.error("Error fetching brand data:", error));
+      .catch((error) => console.error("Error fetching Itemcategory data:", error));
   }, [id]);
 
   const SubmitData = async (e) => {
     e.preventDefault();
-    if (!Brand) {
+    if (!Itemcategory) {
       setError("Please fill all fields before submitting.");
       return;
     }
     setError("");
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/brands/${id}`, { Brand });
+      await axios.put(`${import.meta.env.VITE_API_URL}/Itemcategorys/${id}`, { Itemcategory });
       setShowSuccessModal(true); // show success modal
     } catch (error) {
       console.error("❌ There was an error!", error);
-      setError("An error occurred while updating the brand.");
+      setError("An error occurred while updating the Itemcategory.");
     }
   };
 
   const handleCloseModal = () => {
     setShowSuccessModal(false);
-    Navigate("/brand"); // redirect to brands page
+    Navigate("/Itemcategory"); // redirect to Itemcategorys page
   };
 
   const inputStyle = {
@@ -82,17 +81,17 @@ const Editbrand = () => {
             textShadow: "0 0 6px rgba(255,255,255,0.1)",
           }}
         >
-          Edit brand
+          Edit Itemcategory
         </h2>
 
         <Form onSubmit={SubmitData}>
           <Form.Group className="mb-4">
-            <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>brand Name</Form.Label>
+            <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Itemcategory Name</Form.Label>
             <Form.Control
-              onChange={(e) => setBrand(e.target.value)}
+              onChange={(e) => setItemcategory(e.target.value)}
               type="text"
-              placeholder="Enter brand Name"
-              value={Brand}
+              placeholder="Enter Itemcategory Name"
+              value={Itemcategory}
               style={inputStyle}
             />
           </Form.Group>
@@ -134,7 +133,7 @@ const Editbrand = () => {
             padding: "25px",
           }}
         >
-          <h4>✅ brand Updated Successfully</h4>
+          <h4>✅ Itemcategory Updated Successfully</h4>
           <div style={{ marginTop: "20px" }}>
             <Button
               variant="primary"
@@ -167,4 +166,4 @@ const Editbrand = () => {
   );
 };
 
-export default Editbrand;
+export default EditItemcategory;

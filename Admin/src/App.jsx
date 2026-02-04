@@ -27,6 +27,8 @@ import PurchaseBill from "./PurchaseBill";
 import Credits from "./Credits";
 import Brand from "./Brand";
 import Editbrand from "./Editbrand";
+import Itemcategory from "./Itemcategory";
+import EditItemcategory from "./EditItemcategory";
 
 // Separate component so we can use hooks like useLocation
 const AppContent= () => {
@@ -50,7 +52,8 @@ const AppContent= () => {
         <Route path="/Products" element={<Products />} />
         <Route path="/suppliers" element={<Suppliers />} />
         <Route path="/Customers" element={<Customers />} />
-         <Route path="/brand" element={<Brand />} />
+        <Route path="/brand" element={<Brand />} />
+        <Route path="/itemcategory" element={<Itemcategory />} /> 
         <Route path="/billing" element={<Billing />} />
         <Route path="/purchaseinvoices" element={<Purchaseinvoices/>} />
         <Route path="/addCustomers" element={<AddCustomers/>} />
@@ -62,6 +65,7 @@ const AppContent= () => {
         <Route path="/editsuppliers/:id" element={<Editsuppliers />} />
         <Route path="/editunit/:id" element={<Editunit />} />
         <Route path="/editbrand/:id" element={<Editbrand />} />
+        <Route path="/edititemcategory/:id" element={<EditItemcategory />} />
         <Route path="/editcategory/:id" element={<EditCategory />} />
         <Route path="/purchasebill" element={<PurchaseBill />} />
         <Route path="/stocks" element={<Stocks />} />

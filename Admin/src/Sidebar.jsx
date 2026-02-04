@@ -86,6 +86,10 @@ const Sidebar = () => {
       <Nav.Link className={`navlinks ${isActive("/brand") && "active-link"}`} style={navItemStyle} onClick={() => onClick("/brand")}>
         <FaBalanceScale /> Brand
       </Nav.Link>
+
+      <Nav.Link className={`navlinks ${isActive("/itemcategory") && "active-link"}`} style={navItemStyle} onClick={() => onClick("/itemcategory")}>
+        <FaBalanceScale /> Item Category
+      </Nav.Link>
     </>
   );
 

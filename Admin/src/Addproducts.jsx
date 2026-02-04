@@ -16,6 +16,8 @@ const Addproducts = () => {
   const [error, setError] = useState("");
   const [fetchedCategory, setFetchedCategory] = useState([]);
   const [fetchedUnit, setFetchedUnit] = useState([]);
+  const [fetchedBrand, setFetchedBrand] = useState([]);
+  const [FetchedItemcategory, setFetchedItemcategory] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
 const html5QrCodeRef = React.useRef(null);
@@ -37,6 +39,22 @@ const html5QrCodeRef = React.useRef(null);
       .then((response) => setFetchedUnit(response.data))
       .catch((error) => console.error("Error fetching units:", error));
   }, []);
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/brands`)
+      .then((response) => setFetchedBrand(response.data))
+      .catch((error) => console.error("Error fetching brands:", error));
+  }, []);
+
+   useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/itemcategorys`)
+      .then((response) => setFetchedItemcategory(response.data))
+      .catch((error) => console.error("Error fetching brands:", error));
+  }, []);
+  
+  
 
   // ✅ Clear input fields
   const clearForm = () => {
@@ -224,7 +242,7 @@ const stopBarcodeScanner = () => {
           </div>
 
           <div style={{ display: "flex", gap: "20px" }}>
-            <Form.Group style={{ width: "50%" }} className="mb-4">
+            {/* <Form.Group style={{ width: "50%" }} className="mb-4">
               <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Item Category</Form.Label>
               <Form.Control
                 onChange={(e) => setItemCategory(e.target.value)}
@@ -233,9 +251,36 @@ const stopBarcodeScanner = () => {
                 value={ItemCategory}
                 style={inputStyle}
               />
+            </Form.Group> */}
+            <Form.Group style={{ width: "50%" }} className="mb-4">
+              <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Item Category</Form.Label>
+              <Form.Select
+                className="custom-select"
+                value={ItemCategory || ""}
+                onChange={(e) => setItemCategory(e.target.value)}
+              >
+                <option value="" disabled>Select a Unit</option>
+                {FetchedItemcategory.map((itemcategory) => (
+                  <option key={itemcategory._id} value={itemcategory.Itemcategory}>{itemcategory.Itemcategory}</option>
+                ))}
+              </Form.Select>
             </Form.Group>
 
             <Form.Group style={{ width: "50%" }} className="mb-4">
+              <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Brand</Form.Label>
+              <Form.Select
+                className="custom-select"
+                value={Brand || ""}
+                onChange={(e) => setBrand(e.target.value)}
+              >
+                <option value="" disabled>Select a Brand</option>
+                {fetchedBrand.map((brand) => (
+                  <option key={brand._id} value={brand.Brand}>{brand.Brand}</option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            {/* <Form.Group style={{ width: "50%" }} className="mb-4">
               <Form.Label style={{ fontWeight: "500", color: "#bdbdbd" }}>Brand</Form.Label>
               <Form.Control
                 onChange={(e) => setBrand(e.target.value)}
@@ -244,7 +289,7 @@ const stopBarcodeScanner = () => {
                 value={Brand}
                 style={inputStyle}
               />
-            </Form.Group>
+            </Form.Group> */}
           </div>
 
 
