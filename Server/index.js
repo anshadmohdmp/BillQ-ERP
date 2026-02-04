@@ -39,24 +39,34 @@ mongoose
 
 app.post("/register", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { firstName, lastName, username, password } = req.body;
 
-    if (!username || !password)
+    // Validation
+    if (!firstName || !lastName || !username || !password) {
       return res.status(400).json({ message: "All fields required" });
+    }
 
     const existingUser = await User.findOne({ username });
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({ username, password: hashedPassword });
+    await User.create({
+      firstName,
+      lastName,
+      username,
+      password: hashedPassword,
+    });
 
-    res.json({ message: "User created successfully" });
+    res.status(201).json({ message: "User created successfully" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 app.post("/login", async (req, res) => {
   try {
