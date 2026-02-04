@@ -17,13 +17,13 @@ require('dotenv').config();
 const app = express();
 
 app.use(cors({
-  origin: process.env.CORS_URL, 
+  origin: [process.env.CORS_URL,"http://localhost:5173"], 
     credentials: true
 }));
 app.use(express.json());
 
 mongoose
-  .connect([process.env.MONGO_URL, "http://localhost:5173"])
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("DB Connected"))
   .catch((err) => console.log("DB Connection Error: ", err));
 
