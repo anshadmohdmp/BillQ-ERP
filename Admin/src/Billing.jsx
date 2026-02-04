@@ -162,19 +162,18 @@ const Billing = () => {
 
 
   const selectProduct = (index, product) => {
-  const updated = [...SelectedStocks];
-  updated[index] = {
+    const updated = [...SelectedStocks];
+    updated[index] = {
     ...updated[index],
-    productId: product._id,
+    productId: product.productId || product._id,
     barcode: product.Barcode || "",
     name: product.name,
     unit: product.Unit || "",
     price: Number(product.MRP),
-    cost: Number(product.cost || 0),
+    cost: Number(product.cost || 0),   // 🔥 FIX
     quantity: 1,
     discount: 0,
     total: Number(product.MRP),
-    selectedProduct: { value: product._id, label: `${product.name} (${product.Brand || "No Brand"})` } // ✅ key fix
   };
 
   setSelectedStocks(updated);
@@ -347,24 +346,30 @@ const handleSubmit = async () => {
 
   // ⭐ FIXED PART
   const StocksToSave = validStocks.map((p) => {
-  const stock = Stocks.find(
-    (s) => String(s.productId) === String(p.productId)
-  );
 
-  const cost = Number(stock?.cost || p.cost || 0);
+    const stock = Stocks.find((s) => s._id === p.productId);
 
-  return {
-    Barcode: p.barcode,
-    productId: p.productId,
-    name: p.name,
-    Brand: stock?.Brand || "",
-    quantity: Number(p.quantity),
-    Unit: p.unit,
-    price: Number(p.price),
-    cost, // ✅ GUARANTEED COST
-    profit: (Number(p.price) - cost) * Number(p.quantity), // ✅ FIXED
-  };
-});
+    return {
+  Barcode: p.barcode,
+
+  // 🔥 THIS MUST MATCH STOCK.productId
+  productId: p.productId,
+
+  name: p.name,
+  Brand: stock?.Brand || "",
+
+  quantity: Number(p.quantity),
+  Unit: p.unit,
+  price: Number(p.price),
+
+  // 🔥 ADD COST
+  cost: Number(p.cost),
+
+  // 🔥 PROFIT PER ITEM
+  profit: (Number(p.price) - Number(p.cost)) * Number(p.quantity),
+};
+
+  });
 
 
   const billData = {
@@ -588,48 +593,69 @@ const handleSubmit = async () => {
 
                       <td style={{ position: "relative" }}>
                         <Select
-  value={item.selectedProduct || null}  // ✅ now reflects the chosen product
-  onChange={(selectedOption) => {
-    const selected = Stocks.find(p => p._id === selectedOption.value);
-    if (selected) selectProduct(index, selected);
-  }}
-  options={Stocks.map(p => ({
-    value: p._id,
-    label: `${p.name} (${p.Brand || "No Brand"})`,
-  }))}
-  placeholder="Search or Select Product..."
-  isSearchable={true}
-  menuPortalTarget={document.body}
-  menuPosition="fixed"
-  filterOption={(option, inputValue) => {
-    const search = inputValue.toLowerCase();
-    const name = option.label.toLowerCase();
-    return name.includes(search);
-  }}
-  styles={{
-    control: (base, state) => ({
-      ...base,
-      backgroundColor: "#3a3a3a",
-      border: state.isFocused ? "1px solid #777" : "none",
-      borderRadius: "10px",
-      color: "#fff",
-      height: "47px",
-      width: "280px",
-      boxShadow: "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.05)",
-    }),
-    singleValue: (base) => ({ ...base, color: "#fff" }),
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    menu: (base) => ({ ...base, backgroundColor: "#2e2e2e", color: "#fff", zIndex: 20 }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isFocused ? "#555" : "#2e2e2e",
-      color: "#fff",
-      cursor: "pointer",
-      padding: "10px 12px",
-    }),
-  }}
-/>
-
+                          value={item.selectedProduct || null}
+                          onChange={(selectedOption) => {
+                            const selected = Stocks.find(p => p._id === selectedOption.value);
+                            if (selected) selectProduct(index, selected);
+                          }}
+                          options={Stocks.map(p => ({
+                            value: p._id,
+                            label: `${p.name} (${p.Brand || "No Brand"})`,
+                          }))}
+                          placeholder="Search or Select Product..."
+                          isSearchable={true}
+                          menuPortalTarget={document.body}   // ✅ KEY FIX
+                          menuPosition="fixed"
+                          filterOption={(option, inputValue) => {
+                            const search = inputValue.toLowerCase();
+                            const [name, barcode] = option.label.toLowerCase().split("(");
+                            return (
+                              name.includes(search)
+                            );
+                          }}
+                          styles={{
+                            control: (base, state) => ({
+                              ...base,
+                              backgroundColor: "#3a3a3a",
+                              border: state.isFocused ? "1px solid #777" : "none",
+                              borderRadius: "10px",
+                              color: "#fff",
+                              height: "47px",
+                              width: "280px",
+                              boxShadow: "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.05)",
+                            }),
+                            input: (base) => ({
+                              ...base,
+                              color: "#fff",
+                            }),
+                            singleValue: (base) => ({ ...base, color: "#fff" }),
+                            placeholder: (base) => ({ ...base, color: "#aaa" }),
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 9999, // 🔥 ensure it's on top
+                            }),
+                            menu: (base) => ({
+                              ...base,
+                              backgroundColor: "#2e2e2e",
+                              color: "#fff",
+                              zIndex: 20,
+                            }),
+                            menuList: (base) => ({
+                              ...base,
+                              maxHeight: "260px",
+                              overflowY: "auto",
+                              paddingTop: 0,
+                              paddingBottom: 0,
+                            }),
+                            option: (base, state) => ({
+                              ...base,
+                              backgroundColor: state.isFocused ? "#555" : "#2e2e2e",
+                              color: "#fff",
+                              cursor: "pointer",
+                              padding: "10px 12px",
+                            }),
+                          }}
+                        />
 
 
                       </td>
