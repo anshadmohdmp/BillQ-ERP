@@ -85,48 +85,34 @@ app.post("/login", async (req, res) => {
   }
 });
 
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) return res.status(401).json({ message: "Access denied" });
-
-  try {
-    req.user = jwt.verify(token, JWT_SECRET);
-    next();
-  } catch {
-    res.status(403).json({ message: "Invalid token" });
-  }
-};
-
 
 // Add Products
 
-app.post("/createproduct", verifyToken, async (req, res) => {
+app.post("/createproduct", async (req, res) => {
   Product.create(req.body)
     .then((product) => res.json(product))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/products", verifyToken, async (req, res) => {
+app.get("/products", async (req, res) => {
   Product.find()
     .then((products) => res.json(products))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/products/:id", verifyToken, async (req, res) => {
+app.get("/products/:id", async (req, res) => {
   Product.findById(req.params.id)
     .then((product) => res.json(product))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/products/:id", verifyToken, async (req, res) => {
+app.put("/products/:id", async (req, res) => {
   Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((product) => res.json(product))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.delete("/products/:id", verifyToken, async (req, res) => {
+app.delete("/products/:id", async (req, res) => {
   Product.findByIdAndDelete(req.params.id)
     .then(() => res.json("Product deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
@@ -134,31 +120,31 @@ app.delete("/products/:id", verifyToken, async (req, res) => {
 
 // Add Category
 
-app.post("/createcategory", verifyToken, async (req, res) => {
+app.post("/createcategory", async (req, res) => {
   Category.create(req.body)
     .then((category) => res.json(category))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/categories", verifyToken, async (req, res) => {
+app.get("/categories", async (req, res) => {
   Category.find()
     .then((categories) => res.json(categories))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/categories/:id", verifyToken, async (req, res) => {
+app.get("/categories/:id", async (req, res) => {
   Category.findById(req.params.id)
     .then((category) => res.json(category))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/categories/:id", verifyToken, async (req, res) => {
+app.put("/categories/:id", async (req, res) => {
   Category.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((category) => res.json(category))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.delete("/categories/:id", verifyToken, async (req, res) => {
+app.delete("/categories/:id", async (req, res) => {
   Category.findByIdAndDelete(req.params.id)
     .then(() => res.json("Category deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
@@ -167,31 +153,31 @@ app.delete("/categories/:id", verifyToken, async (req, res) => {
 
 // Add Suppliers 
 
-app.post("/createsupplier", verifyToken, async (req, res) => {
+app.post("/createsupplier", async (req, res) => {
   Suppliers.create(req.body)
     .then((supplier) => res.json(supplier))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/suppliers", verifyToken, async (req, res) => {
+app.get("/suppliers", async (req, res) => {
   Suppliers.find()
     .then((suppliers) => res.json(suppliers))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/suppliers/:id", verifyToken, async (req, res) => {
+app.get("/suppliers/:id", async (req, res) => {
   Suppliers.findById(req.params.id)
     .then((supplier) => res.json(supplier))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/suppliers/:id", verifyToken, async (req, res) => {
+app.put("/suppliers/:id", async (req, res) => {
   Suppliers.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((supplier) => res.json(supplier))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.delete("/suppliers/:id", verifyToken, async (req, res) => {
+app.delete("/suppliers/:id", async (req, res) => {
   Suppliers.findByIdAndDelete(req.params.id)
     .then(() => res.json("Supplier deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
@@ -199,7 +185,7 @@ app.delete("/suppliers/:id", verifyToken, async (req, res) => {
 
 // Invoice
 
-app.post("/createinvoice", verifyToken, async (req, res) => {
+app.post("/createinvoice", async (req, res) => {
   try {
     const {
       InvoiceNumber,
@@ -323,13 +309,13 @@ app.post("/createinvoice", verifyToken, async (req, res) => {
 
 
 
-app.get("/credits", verifyToken, async (req, res) => {
+app.get("/credits", async (req, res) => {
   Credits.find()
     .then((credits) => res.json(credits))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/invoices/:invoiceId/paymentMethod", verifyToken, async (req, res) => {
+app.put("/invoices/:invoiceId/paymentMethod", async (req, res) => {
   const { invoiceId } = req.params;
   const { paymentMethod } = req.body;
 
@@ -357,13 +343,13 @@ app.put("/invoices/:invoiceId/paymentMethod", verifyToken, async (req, res) => {
 
 
 
-app.get("/invoices", verifyToken, async (req, res) => {
+app.get("/invoices", async (req, res) => {
   Invoice.find()
     .then((invoices) => res.json(invoices))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/invoices/:id", verifyToken, async (req, res) => {
+app.get("/invoices/:id", async (req, res) => {
   Invoice.findById(req.params.id)
     .then((invoice) => res.json(invoice))
     .catch((err) => res.status(400).json("Error: " + err));
@@ -371,92 +357,92 @@ app.get("/invoices/:id", verifyToken, async (req, res) => {
 
 // Unit
 
-app.post("/createunit", verifyToken, async (req, res) => {
+app.post("/createunit", async (req, res) => {
   Unit.create(req.body)
     .then((unit) => res.json(unit))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/units", verifyToken, async (req, res) => {
+app.get("/units", async (req, res) => {
   Unit.find()
     .then((units) => res.json(units))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/units/:id", verifyToken, async (req, res) => {
+app.get("/units/:id", async (req, res) => {
   Unit.findById(req.params.id)
     .then((unit) => res.json(unit))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/units/:id", verifyToken, async (req, res) => {
+app.put("/units/:id", async (req, res) => {
   Unit.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((unit) => res.json(unit))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.delete("/units/:id", verifyToken, async (req, res) => {
+app.delete("/units/:id", async (req, res) => {
   Unit.findByIdAndDelete(req.params.id)
     .then(() => res.json("Unit deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
 
-app.post("/createbrand", verifyToken, async (req, res) => {
+app.post("/createbrand", async (req, res) => {
   Brand.create(req.body)
     .then((brand) => res.json(brand))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/brands", verifyToken, async (req, res) => {
+app.get("/brands", async (req, res) => {
   Brand.find()
     .then((brands) => res.json(brands))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/brands/:id", verifyToken, async (req, res) => {
+app.get("/brands/:id", async (req, res) => {
   Brand.findById(req.params.id)
     .then((brand) => res.json(brand))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/brands/:id", verifyToken, async (req, res) => {
+app.put("/brands/:id", async (req, res) => {
   Brand.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((brand) => res.json(brand))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.delete("/brands/:id", verifyToken, async (req, res) => {
+app.delete("/brands/:id", async (req, res) => {
   Brand.findByIdAndDelete(req.params.id)
     .then(() => res.json("brand deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.post("/createitemcategory", verifyToken, async (req, res) => {
+app.post("/createitemcategory", async (req, res) => {
   Itemcategory.create(req.body)
     .then((itemcategory) => res.json(itemcategory))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/itemcategorys", verifyToken, async (req, res) => {
+app.get("/itemcategorys", async (req, res) => {
   Itemcategory.find()
     .then((itemcategorys) => res.json(itemcategorys))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/itemcategorys/:id", verifyToken, async (req, res) => {
+app.get("/itemcategorys/:id", async (req, res) => {
   Itemcategory.findById(req.params.id)
     .then((itemcategory) => res.json(itemcategory))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/itemcategorys/:id", verifyToken, async (req, res) => {
+app.put("/itemcategorys/:id", async (req, res) => {
   Itemcategory.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((itemcategory) => res.json(itemcategory))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.delete("/itemcategorys/:id", verifyToken, async (req, res) => {
+app.delete("/itemcategorys/:id", async (req, res) => {
   Itemcategory.findByIdAndDelete(req.params.id)
     .then(() => res.json("itemcategory deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
@@ -465,31 +451,31 @@ app.delete("/itemcategorys/:id", verifyToken, async (req, res) => {
 
 // Customers
 
-app.post("/Customers", verifyToken, async (req, res) => {
+app.post("/Customers", async (req, res) => {
   Customers.create(req.body)
     .then((customer) => res.json(customer))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/Customers", verifyToken, async (req, res) => {
+app.get("/Customers", async (req, res) => {
   Customers.find()
     .then((customers) => res.json(customers))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/Customers/:id", verifyToken, async (req, res) => {
+app.get("/Customers/:id", async (req, res) => {
   Customers.findById(req.params.id)
     .then((customer) => res.json(customer))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.put("/Customers/:id", verifyToken, async (req, res) => {
+app.put("/Customers/:id", async (req, res) => {
   Customers.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((customer) => res.json(customer))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.delete("/Customers/:id", verifyToken, async (req, res) => {
+app.delete("/Customers/:id", async (req, res) => {
   Customers.findByIdAndDelete(req.params.id)
     .then(() => res.json("Customer deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
@@ -499,7 +485,7 @@ app.delete("/Customers/:id", verifyToken, async (req, res) => {
 
 
 
-app.post("/createpurchaseinvoice", verifyToken, async (req, res) => {
+app.post("/createpurchaseinvoice", async (req, res) => {
   try {
     const {
       InvoiceNumber,
@@ -584,13 +570,13 @@ app.post("/createpurchaseinvoice", verifyToken, async (req, res) => {
 
 
 
-app.get("/purchaseinvoices", verifyToken, async (req, res) => {
+app.get("/purchaseinvoices", async (req, res) => {
   PurchaseInvoice.find()
     .then((purchaseinvoices) => res.json(purchaseinvoices))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-app.get("/stocks", verifyToken, async (req, res) => {
+app.get("/stocks", async (req, res) => {
   try {
     const stocks = await StockModel.find();
     res.json(stocks);
