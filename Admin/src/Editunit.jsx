@@ -3,7 +3,7 @@ import { Button, Form, Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "../src/Css/Suppliers.css";
-import { useAuth } from "./AuthProviderr";
+import { useAuth } from "./AuthProvider";
 
 const Editunit = () => {
   const [UnitName, setUnitName] = useState("");
