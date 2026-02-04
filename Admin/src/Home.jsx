@@ -33,24 +33,25 @@ const Home = () => {
     const dailySalesMap = {};
 
     invoices.forEach((inv) => {
-      const date = new Date(inv.date).toLocaleDateString("en-GB");
+  const date = new Date(inv.date).toLocaleDateString("en-GB");
 
-      if (!dailySalesMap[date]) dailySalesMap[date] = 0;
+  if (!dailySalesMap[date]) dailySalesMap[date] = 0;
 
-      inv.Products?.forEach((p) => {
-        const price = Number(p.price || 0);
-        const cost = Number(p.Cost || 0); // make sure Cost exists in invoice
-        const qty = Number(p.quantity || 0);
+  inv.Stocks?.forEach((p) => {    // ✅ use Stocks
+    const price = Number(p.price || 0);
+    const cost = Number(p.cost || 0);  // ✅ lowercase
+    const qty = Number(p.quantity || 0);
 
-        const lineTotal = price * qty;
-        const lineProfit = (price - cost) * qty;
+    const lineTotal = price * qty;
+    const lineProfit = (price - cost) * qty;
 
-        sales += lineTotal;
-        profit += lineProfit;
+    sales += lineTotal;
+    profit += lineProfit;
 
-        dailySalesMap[date] += lineTotal;
-      });
-    });
+    dailySalesMap[date] += lineTotal;
+  });
+});
+
 
     setTotalSales(sales);
     setTotalProfit(profit);
