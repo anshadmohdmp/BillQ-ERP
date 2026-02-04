@@ -3,6 +3,7 @@ import { Card, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import "./Css/Home.css";
 import { useAuth } from "./AuthProvider";
+
 import {
   BarChart,
   Bar,
@@ -20,6 +21,8 @@ const Home = () => {
   const [totalProfit, setTotalProfit] = useState(0);
 
   const { user } = useAuth(); 
+
+const { logout } = useAuth();
 
   // Fetch all invoices
   useEffect(() => {
@@ -73,6 +76,7 @@ const Home = () => {
 
   return (
     <div className="home">
+      <button onClick={logout}>Logout</button>
       <h2 className="home-title">
         Bill<span style={{ color: "rgb(205, 162, 7)" }}>Q</span>
       </h2>
