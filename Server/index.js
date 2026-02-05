@@ -28,6 +28,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
+if (!process.env.RESEND_API_KEY) {
+  console.error("❌ RESEND_API_KEY is not set!");
+}
+
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("DB Connected"))
@@ -137,21 +141,28 @@ app.post("/forgot-password", async (req, res) => {
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
-    await resend.emails.send({
-      from: "BillQ <onboarding@resend.dev>", // works without domain
-      to: email,
-      subject: "Password Reset Request",
-      html: `
-        <p>Hello ${user.username},</p>
-        <p>You requested a password reset.</p>
-        <p>
-          <a href="${resetLink}">
-            Reset your password
-          </a>
-        </p>
-        <p>This link will expire in 1 hour.</p>
-      `,
-    });
+    try {
+  const response = await resend.emails.send({
+    from: "BillQ <onboarding@resend.dev>",
+    to: email,
+    subject: "Password Reset Request",
+    html: `
+      <p>Hello ${user.username},</p>
+      <p>You requested a password reset.</p>
+      <p><a href="${resetLink}">Reset your password</a></p>
+      <p>This link will expire in 1 hour.</p>
+    `,
+  });
+
+  console.log("📨 Resend response:", response);
+
+} catch (resendError) {
+  console.error("❌ Resend error:", resendError);
+  return res.status(500).json({
+    message: "Failed to send reset email",
+    error: resendError.message,
+  });
+}
 
     res.json({ message: "Password reset link sent to your email" });
 
