@@ -16,7 +16,7 @@ require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("./Models/User");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const crypto = require("crypto");
 
 
@@ -35,6 +35,7 @@ mongoose
 
 
   const JWT_SECRET = process.env.JWT_SECRET;
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
 //Auth
 
@@ -124,36 +125,34 @@ app.post("/forgot-password", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Email not found" });
+    if (!user) {
+      // security best practice: do NOT reveal email existence
+      return res.json({ message: "If this email exists, a reset link was sent." });
+    }
 
     const token = crypto.randomBytes(32).toString("hex");
     user.resetToken = token;
     user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // MUST be false for 587
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+
+    await resend.emails.send({
+      from: "BillQ <onboarding@resend.dev>", // works without domain
       to: email,
       subject: "Password Reset Request",
-      html: `<p>Hello ${user.username},</p>
-             <p>You requested a password reset. Click below:</p>
-             <a href="${resetLink}">${resetLink}</a>
-             <p>This link will expire in 1 hour.</p>`,
-    };
+      html: `
+        <p>Hello ${user.username},</p>
+        <p>You requested a password reset.</p>
+        <p>
+          <a href="${resetLink}">
+            Reset your password
+          </a>
+        </p>
+        <p>This link will expire in 1 hour.</p>
+      `,
+    });
 
-    await transporter.sendMail(mailOptions);
     res.json({ message: "Password reset link sent to your email" });
 
   } catch (err) {
@@ -161,6 +160,7 @@ app.post("/forgot-password", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 
