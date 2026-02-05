@@ -16,7 +16,7 @@ require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("./Models/User");
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
 
@@ -28,10 +28,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-if (!process.env.RESEND_API_KEY) {
-  console.error("❌ RESEND_API_KEY is not set!");
-}
-
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("DB Connected"))
@@ -39,7 +35,6 @@ mongoose
 
 
   const JWT_SECRET = process.env.JWT_SECRET;
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
 //Auth
 
@@ -134,6 +129,7 @@ app.post("/forgot-password", async (req, res) => {
       return res.json({ message: "If this email exists, a reset link was sent." });
     }
 
+    // generate reset token
     const token = crypto.randomBytes(32).toString("hex");
     user.resetToken = token;
     user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
@@ -141,28 +137,30 @@ app.post("/forgot-password", async (req, res) => {
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
-    try {
-  const response = await resend.emails.send({
-    from: "BillQ <onboarding@resend.dev>",
-    to: email,
-    subject: "Password Reset Request",
-    html: `
-      <p>Hello ${user.username},</p>
-      <p>You requested a password reset.</p>
-      <p><a href="${resetLink}">Reset your password</a></p>
-      <p>This link will expire in 1 hour.</p>
-    `,
-  });
+    // configure Brevo SMTP using only user/pass from env
+    const transporter = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false, // 587 should be false
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
 
-  console.log("📨 Resend response:", response);
+    const mailOptions = {
+      from: `"BillQ" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Password Reset Request",
+      html: `
+        <p>Hello ${user.username},</p>
+        <p>You requested a password reset. Click below to reset your password:</p>
+        <p><a href="${resetLink}">Reset your password</a></p>
+        <p>This link will expire in 1 hour.</p>
+      `,
+    };
 
-} catch (resendError) {
-  console.error("❌ Resend error:", resendError);
-  return res.status(500).json({
-    message: "Failed to send reset email",
-    error: resendError.message,
-  });
-}
+    await transporter.sendMail(mailOptions);
 
     res.json({ message: "Password reset link sent to your email" });
 
@@ -171,7 +169,6 @@ app.post("/forgot-password", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 
 
