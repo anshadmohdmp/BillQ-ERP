@@ -132,12 +132,15 @@ app.post("/forgot-password", async (req, res) => {
     await user.save();
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // must be App Password
-      },
-    });
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // MUST be false for 587
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
     const mailOptions = {
