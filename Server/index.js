@@ -149,7 +149,7 @@ app.post("/forgot-password", async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"BillQ" <${process.env.SMTP_USER}>`,
+      from: `"BillQ" <anshadmohdmp@gmail.com>`,
       to: email,
       subject: "Password Reset Request",
       html: `
