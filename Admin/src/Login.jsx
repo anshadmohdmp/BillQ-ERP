@@ -4,6 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { Card, Form, Button, InputGroup } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "./AuthProvider";
+import GoogleButton from "./GoogleButton" 
+
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -104,6 +106,11 @@ const Login = () => {
           >
             Login
           </Button>
+          <hr style={{ borderColor: "#555" }} />
+
+<div className="d-flex justify-content-center mb-3">
+  <GoogleButton />
+</div>
         </Form>
 
         <p className="mt-3 text-center">

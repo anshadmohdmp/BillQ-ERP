@@ -14,15 +14,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // ✅ Login with rememberMe
-  const login = (token, username, rememberMe) => {
-    const authData = { token, username };
+  const login = (token, user, rememberMe) => {
+  const authData = { token, user };
 
-    setUser(authData);
+  setUser(authData);
 
-    if (rememberMe) {
-      localStorage.setItem("auth", JSON.stringify(authData));
-    }
-  };
+  if (rememberMe) {
+    localStorage.setItem("auth", JSON.stringify(authData));
+  }
+};
 
   const logout = () => {
     localStorage.removeItem("auth");

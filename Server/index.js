@@ -18,6 +18,7 @@ const bcrypt = require("bcryptjs");
 const User = require("./Models/User");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const { OAuth2Client } = require("google-auth-library");
 
 
 const app = express();
@@ -27,6 +28,10 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+
 
 mongoose
   .connect(process.env.MONGO_URL)
@@ -87,7 +92,7 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "All fields required" });
 
     const user = await User.findOne({ username });
-    if (!user)
+    if (!user || !user.password)
       return res.status(400).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -95,28 +100,99 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
-      { id: user._id, username: user.username },
-      JWT_SECRET,
+      { id: user._id },
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.json({ token });
+    res.json({
+      token,
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+      },
+    });
+
   } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Access denied" });
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Access denied" });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   try {
-    req.user = jwt.verify(token, JWT_SECRET);
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch {
     res.status(403).json({ message: "Invalid token" });
   }
 };
+
+
+app.post("/auth/google", async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ message: "Token missing" });
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, given_name, family_name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        firstName: given_name,
+        lastName: family_name || "",
+        username: email.split("@")[0],
+        email,
+        googleAuth: true,
+        avatar: picture,
+      });
+    }
+
+    const jwtToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      token: jwtToken,
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+      },
+    });
+
+  } catch (err) {
+    console.error("Google auth error:", err);
+    res.status(401).json({ message: "Invalid Google token" });
+  }
+});
+
+
+
 
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
@@ -149,16 +225,16 @@ app.post("/forgot-password", async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"BillQ" <anshadmohdmp@gmail.com>`,
-      to: email,
-      subject: "Password Reset Request",
-      html: `
-        <p>Hello ${user.username},</p>
-        <p>You requested a password reset. Click below to reset your password:</p>
-        <p><a href="${resetLink}">Reset your password</a></p>
-        <p>This link will expire in 1 hour.</p>
-      `,
-    };
+  from: `"BillQ" <anshadmohdmp@gmail.com>`, // ✔ must be verified in Brevo
+  to: email,
+  subject: "Password Reset Request",
+  html: `
+    <p>Hello ${user.username},</p>
+    <p>Click below to reset your password:</p>
+    <a href="${resetLink}">Reset Password</a>
+    <p>Expires in 1 hour</p>
+  `,
+};
 
     await transporter.sendMail(mailOptions);
 
