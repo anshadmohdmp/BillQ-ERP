@@ -6,7 +6,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "./AuthProvider";
 import GoogleButton from "./GoogleButton" 
 import "./Css/Login.css"
-import { Cursor } from "mongoose";
 
 
 const Login = () => {
