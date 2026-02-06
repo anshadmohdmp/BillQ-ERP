@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, Form, Button, InputGroup } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "./Css/Register.css"
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -51,8 +52,19 @@ const Register = () => {
     }
   };
 
+  const inputStyle = {
+    border: "none",
+    borderRadius: "10px",
+    padding: "12px",
+    color: "#fff",
+    background: "#3a3a3a",
+    boxShadow:
+      "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.05)",
+    cursor:"pointer"
+  };
+
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <div className="d-flex justify-content-center align-items-center vh-100 register">
       <Card
         style={{
           width: "420px",
@@ -72,6 +84,7 @@ const Register = () => {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="Enter first name"
+              style={inputStyle}
             />
           </Form.Group>
 
@@ -83,6 +96,7 @@ const Register = () => {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Enter last name"
+              style={inputStyle}
             />
           </Form.Group>
 
@@ -94,6 +108,7 @@ const Register = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
+              style={inputStyle}
             />
           </Form.Group>
 
@@ -105,6 +120,7 @@ const Register = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter username"
+              style={inputStyle}
             />
           </Form.Group>
 
@@ -117,9 +133,10 @@ const Register = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
+                style={inputStyle}
               />
               <InputGroup.Text
-                style={{ cursor: "pointer" }}
+                style={inputStyle}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -136,9 +153,10 @@ const Register = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter password"
+                style={inputStyle}
               />
               <InputGroup.Text
-                style={{ cursor: "pointer" }}
+                style={inputStyle}
                 onClick={() =>
                   setShowConfirmPassword(!showConfirmPassword)
                 }
@@ -158,14 +176,14 @@ const Register = () => {
           <Button
             type="submit"
             className="w-100"
-            style={{ background: "#1a37aa", border: "none" }}
+            style={{ background: "#c0941b", border: "none" }}
           >
             Register
           </Button>
         </Form>
 
         <p className="text-center mt-3">
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/login" style={{color:"orange"}}>Login</Link>
         </p>
       </Card>
     </div>

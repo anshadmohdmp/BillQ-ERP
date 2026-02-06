@@ -5,6 +5,8 @@ import { Card, Form, Button, InputGroup } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "./AuthProvider";
 import GoogleButton from "./GoogleButton" 
+import "./Css/Login.css"
+import { Cursor } from "mongoose";
 
 
 const Login = () => {
@@ -36,8 +38,19 @@ const Login = () => {
     }
   };
 
+  const inputStyle = {
+    border: "none",
+    borderRadius: "10px",
+    padding: "12px",
+    color: "#fff",
+    background: "#3a3a3a",
+    boxShadow:
+      "inset 3px 3px 6px rgba(0,0,0,0.6), inset -3px -3px 6px rgba(255,255,255,0.05)",
+    cursor:"pointer"
+  };
+
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <div className="d-flex justify-content-center align-items-center vh-100 login">
       <Card
         style={{
           width: "400px",
@@ -58,6 +71,7 @@ const Login = () => {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter username"
               required
+              style={inputStyle}
             />
           </Form.Group>
 
@@ -71,10 +85,12 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 required
+                style={inputStyle}
               />
               <InputGroup.Text
-                style={{ cursor: "pointer" }}
+                
                 onClick={() => setShowPassword(!showPassword)}
+                style={inputStyle}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </InputGroup.Text>
@@ -90,7 +106,7 @@ const Login = () => {
               onChange={(e) => setRememberMe(e.target.checked)}
             />
 
-            <Link to="/forgot-password" style={{ fontSize: "14px" }}>
+            <Link to="/forgot-password" style={{ fontSize: "14px",color:"orange" }}>
               Forgot password?
             </Link>
           </div>
@@ -102,7 +118,7 @@ const Login = () => {
           <Button
             type="submit"
             className="w-100"
-            style={{ background: "#1a37aa", border: "none" }}
+            style={{ background: "#c0941b", border: "none" }}
           >
             Login
           </Button>
@@ -114,7 +130,7 @@ const Login = () => {
         </Form>
 
         <p className="mt-3 text-center">
-          Don&apos;t have an account? <Link to="/register">Register</Link>
+          Don&apos;t have an account? <Link to="/register" style={{color:"orange"}}>Register</Link>
         </p>
       </Card>
     </div>
