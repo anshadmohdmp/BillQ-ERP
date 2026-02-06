@@ -1,37 +1,49 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // 👈 important
 
-  // ✅ Restore session ONLY if remembered
   useEffect(() => {
     const storedAuth = localStorage.getItem("auth");
     if (storedAuth) {
-      setUser(JSON.parse(storedAuth));
+      const authData = JSON.parse(storedAuth);
+      setUser(authData);
+
+      // ✅ restore token into axios
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${authData.token}`;
     }
+    setLoading(false);
   }, []);
 
-  // ✅ Login with rememberMe
   const login = (token, user, rememberMe) => {
-  const authData = { token, user };
+    const authData = { token, user };
 
-  setUser(authData);
+    setUser(authData);
 
-  if (rememberMe) {
-    localStorage.setItem("auth", JSON.stringify(authData));
-  }
-};
+    axios.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${token}`;
+
+    if (rememberMe) {
+      localStorage.setItem("auth", JSON.stringify(authData));
+    }
+  };
 
   const logout = () => {
     localStorage.removeItem("auth");
+    delete axios.defaults.headers.common["Authorization"];
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

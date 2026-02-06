@@ -33,15 +33,9 @@ import "./App.css";
 import { useAuth } from "./AuthProvider"; 
 import ForgotPassword from "./ForgetPassword";
 import ResetPassword from "./ResetPassword";
+import ProtectedRoute from "./ProtectedRoute";
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth(); // ✅ use context
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
+// Protected Route 
 
 
 // App Content with Sidebar logic
