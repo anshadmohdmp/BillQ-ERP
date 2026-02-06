@@ -201,7 +201,7 @@ const Invoices = () => {
                 <th>Discount</th>
                 <th>Total</th>
                 <th>Payment Method</th>
-                <th>Action</th>
+                <th>Print Invoice</th>
               </tr>
             </thead>
             <tbody>
