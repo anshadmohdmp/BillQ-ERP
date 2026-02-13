@@ -481,7 +481,7 @@ const handleSubmit = async () => {
             textShadow: "0 0 6px rgba(255,255,255,0.1)",
           }}
         >
-          Billingsss
+          Billing
         </h2>
 
         <Form
