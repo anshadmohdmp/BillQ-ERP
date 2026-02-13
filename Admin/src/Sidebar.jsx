@@ -6,6 +6,8 @@ import { CiViewList } from "react-icons/ci";
 import { LuBox } from "react-icons/lu";
 import { TbCategory2 } from "react-icons/tb";
 import { FiFileText } from "react-icons/fi";
+import { BiCategory } from "react-icons/bi";
+import { MdOutlineBusiness } from "react-icons/md";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Css/Sidebar.css";
 
@@ -84,11 +86,11 @@ const Sidebar = () => {
       </Nav.Link>
 
       <Nav.Link className={`navlinks ${isActive("/brand") && "active-link"}`} style={navItemStyle} onClick={() => onClick("/brand")}>
-        <FaBalanceScale /> Brand
+        <MdOutlineBusiness /> Brand
       </Nav.Link>
 
       <Nav.Link className={`navlinks ${isActive("/itemcategory") && "active-link"}`} style={navItemStyle} onClick={() => onClick("/itemcategory")}>
-        <FaBalanceScale /> Item Category
+        <BiCategory /> Item Category
       </Nav.Link>
     </>
   );
