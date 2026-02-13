@@ -4,6 +4,7 @@ import axios from "axios";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
+import "./Css/Itemcategory.css"
 
 const Itemcategory = () => {
   const [Itemcategory, setItemcategory] = useState("");
@@ -100,7 +101,7 @@ const Itemcategory = () => {
 
   return (
     <div
-      className="Itemcategorys"
+      className="itemcategory"
     >
       {/* Add Itemcategory Card */}
       <Card

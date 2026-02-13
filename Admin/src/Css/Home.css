@@ -35,7 +35,7 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
-  background-color: "#2a2a2a";
+  background-color: "#2a2a2a" !important;
 }
 
 @media (max-width: 1400px) {

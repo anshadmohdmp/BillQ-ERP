@@ -66,7 +66,7 @@
     width: 1100px;
           padding: 40px;
           border-radius: 20px;
-          background: #2a2a2a;
+          background: #2a2a2a !important;
           box-shadow: 8px 8px 16px rgba(0,0,0,0.7), -4px -4px 12px rgba(255,255,255,0.05);
           color: #fff;
           margin: 10px 0;
