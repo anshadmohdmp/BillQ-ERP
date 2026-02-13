@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row, Col } from "react-bootstrap";
+import { Card, Row, Col, Button } from "react-bootstrap";
 import axios from "axios";
 import "./Css/Home.css";
 import { useAuth } from "./AuthProvider";
@@ -76,7 +76,15 @@ const { logout } = useAuth();
 
   return (
     <div className="home">
-      <button onClick={logout}>Logout</button>
+      <Button style={{
+                border: "none",
+                padding: "12px 40px",
+                borderRadius: "12px",
+                background: "linear-gradient(145deg, #3a3a3a, #1e1e1e)",
+                fontWeight: "600",
+                boxShadow: "4px 4px 8px rgba(0,0,0,0.8), -3px -3px 6px rgba(255,255,255,0.05)",
+                transition: "0.3s",
+              }} onClick={logout}>Logout</Button>
       <h2 className="home-title">
         Bill<span style={{ color: "rgb(205, 162, 7)" }}>Q</span>
       </h2>
