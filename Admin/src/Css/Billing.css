@@ -1,7 +1,7 @@
 .billing{
  
     min-height: 100vh;
-    background-color: #3e3e3e;
+    background: linear-gradient(135deg, #1e1e1e, #252525);
     display: flex;
     justify-content: center;
     padding: 10px;

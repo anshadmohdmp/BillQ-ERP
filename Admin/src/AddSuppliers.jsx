@@ -70,7 +70,7 @@ const AddSuppliers = () => {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#3e3e3e",
+        background: "linear-gradient(135deg, #1e1e1e, #252525)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

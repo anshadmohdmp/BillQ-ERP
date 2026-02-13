@@ -10,7 +10,7 @@ body {
 /* Main home wrapper */
 .home {
   min-height: 100vh;
-  background: #3e3e3e;
+ background: linear-gradient(135deg, #1e1e1e, #252525);
   padding: 20px 40px;
    /* sidebar space for desktop */
 }
