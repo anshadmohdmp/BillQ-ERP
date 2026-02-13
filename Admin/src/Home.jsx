@@ -76,15 +76,24 @@ const { logout } = useAuth();
 
   return (
     <div className="home">
-      <Button style={{
-                border: "none",
-                padding: "12px 40px",
-                borderRadius: "12px",
-                background: "linear-gradient(145deg, #3a3a3a, #1e1e1e)",
-                fontWeight: "600",
-                boxShadow: "4px 4px 8px rgba(0,0,0,0.8), -3px -3px 6px rgba(255,255,255,0.05)",
-                transition: "0.3s",
-              }} onClick={logout}>Logout</Button>
+     <div className="d-flex justify-content-end mb-3">
+    <Button
+      className="logout"
+      style={{
+        border: "none",
+        padding: "12px 40px",
+        borderRadius: "12px",
+        background: "linear-gradient(145deg, #3a3a3a, #1e1e1e)",
+        fontWeight: "600",
+        boxShadow:
+          "4px 4px 8px rgba(0,0,0,0.8), -3px -3px 6px rgba(255,255,255,0.05)",
+        transition: "0.3s",
+      }}
+      onClick={logout}
+    >
+      Logout
+    </Button>
+  </div>
       <h2 className="home-title">
         Bill<span style={{ color: "rgb(205, 162, 7)" }}>Q</span>
       </h2>
@@ -122,7 +131,7 @@ const { logout } = useAuth();
       {/* Sales Chart */}
       <Row className="mb-4">
         <Col xs={12} className="d-flex justify-content-center">
-          <Card className="chart-card">
+          <Card style={{background: "#2a2a2a"}} className="chart-card">
             <h6>Sales Report</h6>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={salesData}>

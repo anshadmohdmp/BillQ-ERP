@@ -1,39 +1,40 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import Home from "./Home";
-import Addproducts from "./Addproducts";
-import AddCategory from "./AddCategory";
-import AddSuppliers from "./AddSuppliers";
-import Suppliers from "./Suppliers";
-import Billing from "./Billing";
-import Unit from "./Unit";
-import Invoices from "./Invoices";
-import Editstock from "./Editstock";
-import Editsuppliers from "./Editsuppliers";
-import Editunit from "./Editunit";
-import EditCategory from "./EditCategory";
-import Welcome from "./Welcome";
-import Purchaseinvoices from "./Purchaseinvoices";
-import Customers from "./Customers";
-import AddCustomers from "./AddCustomers";
-import EditCustomers from "./EditCustomers";
-import Products from "./Products";
-import Stocks from "./Stocks";
-import PurchaseBill from "./PurchaseBill";
-import Credits from "./Credits";
-import Brand from "./Brand";
-import Editbrand from "./Editbrand";
-import Itemcategory from "./Itemcategory";
-import EditItemcategory from "./EditItemcategory";
-import Sidebar from "./Sidebar";
-import Login from "./Login";
-import Register from "./Register";
+const Home = lazy(() => import("./Home"));
+const Addproducts = lazy(() => import("./Addproducts"));
+const AddCategory = lazy(() => import("./AddCategory"));
+const AddSuppliers = lazy(() => import("./AddSuppliers"));
+const Suppliers = lazy(() => import("./Suppliers"));
+const Billing = lazy(() => import("./Billing"));
+const Unit = lazy(() => import("./Unit"));
+const Invoices = lazy(() => import("./Invoices"));
+const Editstock = lazy(() => import("./Editstock"));
+const Editsuppliers = lazy(() => import("./Editsuppliers"));
+const Editunit = lazy(() => import("./Editunit"));
+const EditCategory = lazy(() => import("./EditCategory"));
+const Welcome = lazy(() => import("./Welcome"));
+const Purchaseinvoices = lazy(() => import("./Purchaseinvoices"));
+const Customers = lazy(() => import("./Customers"));
+const AddCustomers = lazy(() => import("./AddCustomers"));
+const EditCustomers = lazy(() => import("./EditCustomers"));
+const Products = lazy(() => import("./Products"));
+const Stocks = lazy(() => import("./Stocks"));
+const PurchaseBill = lazy(() => import("./PurchaseBill"));
+const Credits = lazy(() => import("./Credits"));
+const Brand = lazy(() => import("./Brand"));
+const Editbrand = lazy(() => import("./Editbrand"));
+const Itemcategory = lazy(() => import("./Itemcategory"));
+const EditItemcategory = lazy(() => import("./EditItemcategory"));
+const Login = lazy(() => import("./Login"));
+const Register = lazy(() => import("./Register"));
+const ForgotPassword = lazy(() => import("./ForgetPassword"));
+const ResetPassword = lazy(() => import("./ResetPassword"));
+
+import ProtectedRoute from "./ProtectedRoute";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { useAuth } from "./AuthProvider"; 
-import ForgotPassword from "./ForgetPassword";
-import ResetPassword from "./ResetPassword";
-import ProtectedRoute from "./ProtectedRoute";
+import Sidebar from "./Sidebar";
 
 // Protected Route 
 
@@ -48,6 +49,13 @@ const AppContent = () => {
       {!hideSidebar && <Sidebar />}
 
       <div className="page-content">
+        <Suspense
+    fallback={
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-warning" role="status"></div>
+      </div>
+    }
+  >
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Welcome />} />
@@ -251,6 +259,7 @@ const AppContent = () => {
             }
           />
         </Routes>
+        </Suspense>
       </div>
     </div>
   );
