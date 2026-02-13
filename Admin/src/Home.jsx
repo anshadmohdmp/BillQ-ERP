@@ -145,7 +145,7 @@ const { logout } = useAuth();
                     color: "#fff",
                   }}
                 />
-                <Bar dataKey="sales" fill="#00bfff" />
+                <Bar dataKey="sales" fill="rgb(205, 162, 7)" />
               </BarChart>
             </ResponsiveContainer>
           </Card>
