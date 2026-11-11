@@ -29,7 +29,7 @@ const Login = lazy(() => import("./Login"));
 const Register = lazy(() => import("./Register"));
 const ForgotPassword = lazy(() => import("./ForgetPassword"));
 const ResetPassword = lazy(() => import("./ResetPassword"));
-
+const EditBilling = lazy(() => import("./EditBilling"));
 import ProtectedRoute from "./ProtectedRoute";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -89,6 +89,15 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+  path="/editbilling/:id"
+  element={
+    <ProtectedRoute>
+      <EditBilling />
+    </ProtectedRoute>
+  }
+/>
           
           <Route
             path="/addsuppliers"

@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Table, Card, Button, Modal } from "react-bootstrap";
-import { MdPrint } from "react-icons/md";
+import { MdPrint, MdEdit } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import "./Css/Invoices.css";
 import { useAuth } from "./AuthProvider";
 
@@ -10,50 +11,51 @@ const Invoices = () => {
   const [showPrintConfirm, setShowPrintConfirm] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
 
-  const { user } = useAuth(); 
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchInvoices();
   }, []);
 
-
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/invoices`,{
-    headers: {
-      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
-    },
-  });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/invoices`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
       setInvoices(response.data);
     } catch (error) {
       console.error("Error fetching invoices:", error);
     }
   };
 
-  console.log(Invoices);
-  
-
   const handlePrintConfirm = (_id) => {
     setSelectedInvoiceId(_id);
     setShowPrintConfirm(true);
   };
 
+  const handleEdit = (_id) => {
+    navigate(`/editbilling/${_id}`);
+  };
+
   const handlePrint = async () => {
     setShowPrintConfirm(false);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/invoices/${selectedInvoiceId}`,{
-    headers: {
-      Authorization: `Bearer ${user.token}`, // ✅ pass token from context
-    },
-  });
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/invoices/${selectedInvoiceId}`,
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
       const billData = response.data;
 
+      const items = billData.Stocks || [];
       const Subtotal =
         billData.Subtotal ||
-        billData.Products?.reduce((acc, p) => acc + (p.price || 0) * (p.quantity || 0), 0) ||
+        items.reduce((acc, p) => acc + (p.price || 0) * (p.quantity || 0), 0) ||
         0;
       const Tax = billData.Tax || 0;
-      const TotalAmount = Subtotal + Tax;
+      const Discount = billData.Discount || 0;
+      const TotalAmount =
+        billData.TotalAmount !== undefined ? billData.TotalAmount : Subtotal + Tax - Discount;
 
       const iframe = document.createElement("iframe");
       iframe.style.position = "absolute";
@@ -111,22 +113,22 @@ const Invoices = () => {
                 </tr>
               </thead>
               <tbody>
-                ${billData.Products?.map((p, i) => `
+                ${items.map((p, i) => `
                   <tr>
                     <td>${i + 1}</td>
-                    <td>${p.name || ""}</td>
+                    <td>${p.Brand || ""} ${p.name || ""}</td>
                     <td>${p.quantity || 0}</td>
-                    <td>${p.price?.toFixed(2) || "0.00"}</td>
+                    <td>${(p.price || 0).toFixed(2)}</td>
                     <td>${((p.quantity || 0) * (p.price || 0)).toFixed(2)}</td>
                   </tr>
-                `).join("") || ""}
+                `).join("")}
               </tbody>
             </table>
             <section class="summary">
               <table>
                 <tr><td>Subtotal:</td><td>${Subtotal.toFixed(2)}</td></tr>
                 <tr><td>Tax:</td><td>${Tax.toFixed(2)}</td></tr>
-                <tr><td>Discount:</td><td>-${billData.Discount.toFixed(2)}</td></tr>
+                <tr><td>Discount:</td><td>-${Discount.toFixed(2)}</td></tr>
                 <tr class="total"><td>Total:</td><td>${TotalAmount.toFixed(2)}</td></tr>
                 <tr><td>Payment Method:</td><td>${billData.PaymentMethod || ""}</td></tr>
               </table>
@@ -201,6 +203,7 @@ const Invoices = () => {
                 <th>Discount</th>
                 <th>Total</th>
                 <th>Payment Method</th>
+                <th>Edit Invoice</th>
                 <th>Print Invoice</th>
               </tr>
             </thead>
@@ -216,19 +219,22 @@ const Invoices = () => {
                     <td><div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>{invoice.Stocks?.map((p, i) => <span key={i}>{p.quantity}</span>)}</div></td>
                     <td><div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>{invoice.Stocks?.map((p, i) => <span key={i}>{p.Unit}</span>)}</div></td>
                     <td><div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>{invoice.Stocks?.map((p, i) => <span key={i}>{p.price?.toFixed(2)}</span>)}</div></td>
-                    
-                   
                     <td>{(invoice.Subtotal || 0).toFixed(2)}</td>
                     <td>{(invoice.Tax || 0).toFixed(2)}</td>
-                     <td>{(invoice.Discount || 0).toFixed(2)}</td>
+                    <td>{(invoice.Discount || 0).toFixed(2)}</td>
                     <td>{(invoice.TotalAmount || 0).toFixed(2)}</td>
                     <td>{invoice.PaymentMethod}</td>
-                    <td style={{ textAlign: "center", cursor: "pointer" }} onClick={() => handlePrintConfirm(invoice._id)}><MdPrint /> Print Invoice</td>
+                    <td style={{ textAlign: "center", cursor: "pointer" }} onClick={() => handleEdit(invoice._id)}>
+                      <MdEdit /> Edit
+                    </td>
+                    <td style={{ textAlign: "center", cursor: "pointer" }} onClick={() => handlePrintConfirm(invoice._id)}>
+                      <MdPrint /> Print Invoice
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={14} style={{ textAlign: "center" }}>No Sales Invoices found</td>
+                  <td colSpan={15} style={{ textAlign: "center" }}>No Sales Invoices found</td>
                 </tr>
               )}
             </tbody>

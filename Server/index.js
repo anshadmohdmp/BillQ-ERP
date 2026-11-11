@@ -557,6 +557,148 @@ app.get("/invoices/:id", verifyToken, async (req, res) => {
   }
 });
 
+// Update invoice (only if belongs to this user) + re-adjust stock
+app.put("/invoices/:id", verifyToken, async (req, res) => {
+  try {
+    const {
+      date,
+      CustomerName,
+      CustomerNumber,
+      Stocks,
+      Subtotal,
+      Tax,
+      Discount,
+      PaymentMethod,
+      TotalAmount,
+    } = req.body;
+
+    if (!Array.isArray(Stocks) || !Stocks.length) {
+      return res.status(400).json({ message: "Invalid invoice data" });
+    }
+
+    const invoice = await Invoice.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+
+    // Quantities from the old invoice, per product
+    const oldQty = {};
+    for (const item of invoice.Stocks) {
+      const pid = String(item.productId);
+      oldQty[pid] = (oldQty[pid] || 0) + Number(item.quantity);
+    }
+
+    // Quantities requested in the edited invoice, per product
+    const newQty = {};
+    for (const item of Stocks) {
+      const pid = String(item.productId);
+      if (!newQty[pid]) newQty[pid] = { qty: 0, name: item.name };
+      newQty[pid].qty += Number(item.quantity);
+    }
+
+    // STEP 1: Check availability (current stock + what the old invoice took)
+    for (const pid of Object.keys(newQty)) {
+      const rows = await StockModel.find({ productId: pid, userId: req.user.id });
+      const available =
+        rows.reduce((sum, s) => sum + Number(s.quantity), 0) + (oldQty[pid] || 0);
+
+      if (available < newQty[pid].qty) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${newQty[pid].name}. Available: ${available}`,
+        });
+      }
+    }
+
+    // STEP 2: Put the old invoice's quantities back into stock
+    for (const item of invoice.Stocks) {
+      const existing = await StockModel.findOne({
+        productId: item.productId,
+        cost: item.cost,
+        userId: req.user.id,
+      });
+
+      if (existing) {
+        existing.quantity += Number(item.quantity);
+        await existing.save();
+      } else {
+        await StockModel.create({
+          productId: item.productId,
+          name: item.name,
+          quantity: Number(item.quantity),
+          cost: Number(item.cost),
+          MRP: Number(item.price),
+          Unit: item.Unit,
+          Barcode: item.Barcode,
+          Brand: item.Brand || null,
+          userId: req.user.id,
+        });
+      }
+    }
+
+    // STEP 3: Build the new invoice items with cost
+    const invoiceStocks = [];
+    for (const item of Stocks) {
+      const productId = String(item.productId);
+      const stockRow = await StockModel.findOne({ productId, userId: req.user.id }).sort({ createdAt: 1 });
+      if (!stockRow) {
+        return res.status(400).json({ message: `Stock not found for ${item.name}` });
+      }
+
+      invoiceStocks.push({
+        Barcode: item.Barcode,
+        productId: item.productId,
+        name: item.name,
+        Brand: item.Brand,
+        quantity: Number(item.quantity),
+        Unit: item.Unit,
+        price: Number(item.price),
+        cost: Number(stockRow.cost),
+      });
+    }
+
+    // STEP 4: Save the updated invoice
+    invoice.date = date ? new Date(date) : invoice.date;
+    invoice.CustomerName = CustomerName || "Walk-in";
+    invoice.CustomerNumber = CustomerNumber || "";
+    invoice.Stocks = invoiceStocks;
+    invoice.Subtotal = Number(Subtotal);
+    invoice.Tax = Number(Tax);
+    invoice.Discount = Number(Discount);
+    invoice.PaymentMethod = PaymentMethod;
+    invoice.TotalAmount = Number(TotalAmount);
+    await invoice.save();
+
+    // STEP 5: Deduct stock for the new quantities (FIFO)
+    for (const item of invoiceStocks) {
+      let remainingQty = Number(item.quantity);
+      const productId = String(item.productId);
+
+      const stockRows = await StockModel.find({ productId, userId: req.user.id }).sort({ createdAt: 1 });
+
+      for (const stock of stockRows) {
+        if (remainingQty <= 0) break;
+
+        if (stock.quantity <= remainingQty) {
+          remainingQty -= stock.quantity;
+          await StockModel.deleteOne({ _id: stock._id });
+        } else {
+          stock.quantity -= remainingQty;
+          await stock.save();
+          remainingQty = 0;
+        }
+      }
+    }
+
+    // If it's no longer a Credit sale, remove the credit entry
+    if (PaymentMethod !== "Credit") {
+      await Credits.findOneAndDelete({ invoiceId: invoice._id, userId: req.user.id });
+    }
+
+    res.json({ message: "Invoice updated successfully", invoice });
+  } catch (error) {
+    console.error("❌ INVOICE UPDATE ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Update payment method (only if invoice belongs to user)
 app.put("/invoices/:invoiceId/paymentMethod", verifyToken, async (req, res) => {
   const { invoiceId } = req.params;
